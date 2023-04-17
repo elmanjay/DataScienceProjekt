@@ -7,6 +7,8 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 
 # Erstellen Sie ein Objekt für das zu beobachtende Unternehmen
+assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
+aktien = ["Amazon","Googel","Tesla","Microsoft"]
 msft = yf.Ticker("MSFT")
 df= msft.history(period="max")
 df.reset_index(inplace= True)
@@ -16,10 +18,9 @@ df.reset_index(inplace= True)
 app = dash.Dash(__name__)
 app.layout = html.Div(
     children=[
+        dcc.Dropdown(id='aktien-dropdown',options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],value=assets[0]),
         html.H1('Verlauf der Microsoft Aktie', style={'textAlign': 'center'}),
         dcc.Graph(id="timeline", figure=px.line(df, x="Date", y="Open"),style={'backgroundColor': '#000000'}),
-        dcc.Dropdown(id="dropdown",options=[{'label': 'Microsoft', 'value': 'option1'},{"label": 'Netflix', "value": 'option2'},
-        {'label': 'Tesla', 'value': 'option3'}]),
         html.Br(),
         html.Div(id='my-output'),
 ])
