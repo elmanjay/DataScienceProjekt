@@ -15,29 +15,30 @@ aktien = ["Amazon","Googel","Tesla","Microsoft"]
 app = dash.Dash(__name__)
 app.layout = html.Div(
     children=[
-        html.H1('Text', id="head", style={'textAlign': 'center'}),
+        html.H1('Text', id="head", style={'textAlign': 'center','backgroundColor': 'black',"color":"white"}),
         dcc.Dropdown(
             id='aktien-dropdown',
             options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
-            value=assets[0]
+            value=assets[0], style= {'color': 'white', "backgroundColor": "black"}
         ),
         html.Div(
             children=[
                 dcc.Graph(id="timeline"),
                 html.Div(
                     children=[
-                        html.H2('Informationen'),
+                        html.H2('Informationen', style={'color': 'white'}),
                         html.Ul([
-                            html.Li(id="max"),
-                            html.Li(id="min"),
+                            html.Li(id="max", style={'color': 'white'}),
+                            html.Li(id="min", style={'color': 'white'}),
                         ])
                     ],
-                    style={'border': '2px solid #ccc', 'padding': '8px'}
+                    style={'border': '2px solid #ccc', 'padding': '8px','backgroundColor': 'black'}
                 )
             ],
-            style={'width': '70%', 'display': 'inline-block'}
+            style={'width': '70%', 'display': 'inline-block','backgroundColor': 'black'}
         )
-    ]
+    ],
+    style={'backgroundColor': 'black'}
 )
 
 @app.callback(
