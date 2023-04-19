@@ -16,9 +16,29 @@ app = dash.Dash(__name__)
 app.layout = html.Div(
     children=[
         html.H1('Text', id="head", style={'textAlign': 'center'}),
-        dcc.Dropdown(id='aktien-dropdown',options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],value=assets[0]),
-        dcc.Graph(id="timeline")
-        ])
+        dcc.Dropdown(
+            id='aktien-dropdown',
+            options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
+            value=assets[0]
+        ),
+        html.Div(
+            children=[
+                dcc.Graph(id="timeline"),
+                html.Div(
+                    children=[
+                        html.H2('Informationen'),
+                        html.Ul([
+                            html.Li(id="max"),
+                            html.Li(id="min"),
+                        ])
+                    ],
+                    style={'border': '2px solid #ccc', 'padding': '8px'}
+                )
+            ],
+            style={'width': '70%', 'display': 'inline-block'}
+        )
+    ]
+)
 
 @app.callback(
     Output(component_id='timeline', component_property='figure'),
@@ -38,6 +58,29 @@ def update_output_div(input_value):
 )
 def update_output_div(input_value):
     return 'Verlauf der {} Aktie'.format(input_value)
+
+#Bearbeitung der Info BOx
+@app.callback(
+    Output(component_id='max', component_property='children'),
+    Input(component_id='aktien-dropdown', component_property='value')
+)
+def update_output_div(input_value):
+    msft = yf.Ticker(input_value)
+    df= msft.history(period="max")
+    df.reset_index(inplace= True)  
+
+    return 'All Time High: {} Dollar.'.format(round(df["Open"].max(),2 ))
+
+@app.callback(
+    Output(component_id='min', component_property='children'),
+    Input(component_id='aktien-dropdown', component_property='value')
+)
+def update_output_div(input_value):
+    msft = yf.Ticker(input_value)
+    df= msft.history(period="max")
+    df.reset_index(inplace= True)  
+
+    return 'All Time Low: {} Dollar.'.format(round(df["Open"].min(),2 ))
     
 
 # Starte die App
