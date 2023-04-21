@@ -10,36 +10,65 @@ import plotly.express as px
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
 aktien = ["Amazon","Googel","Tesla","Microsoft"]
 
+# CSS-Stile
+external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap']
+
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+dropdown_style = {
+    'color': 'black',
+    'backgroundColor': 'white',
+    'border': '1px solid black',
+    'width': '800px',
+    'fontFamily': "Open Sans"
+}
+info_box_style = {
+    'border': '1px solid black',
+    'padding': '8px',
+    'backgroundColor': 'white',
+    'width': '300px',
+    'fontFamily': 'Open Sans'
+}
+graph = {
+    'border': '1px solid black',
+    'padding': '8px',
+    'backgroundColor': 'white',
+    'width': '800px',
+    'fontFamily': "Open Sans"  
+}
+
 
 # Erstelle das Dash-Layout
 app = dash.Dash(__name__)
 app.layout = html.Div(
     children=[
-        html.H1('Text', id="head", style={'textAlign': 'center','backgroundColor': 'black',"color":"white"}),
+        html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}),
+        html.Div(
+            children=[
+        html.H2("Wählen Sie die zu untersuchende Aktie aus:"),
         dcc.Dropdown(
             id='aktien-dropdown',
             options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
-            value=assets[0], style= {'color': 'white', "backgroundColor": "black"}
-        ),
+            value=assets[0]
+        )], style=dropdown_style),
         html.Div(
             children=[
-                dcc.Graph(id="timeline"),
-                html.Div(
-                    children=[
-                        html.H2('Informationen', style={'color': 'white'}),
-                        html.Ul([
-                            html.Li(id="max", style={'color': 'white'}),
-                            html.Li(id="min", style={'color': 'white'}),
-                        ])
+                dcc.Graph(id="timeline", style= graph)
+                ,
+        html.Div(
+            children=[
+                html.H2('Informationen', style={}),
+                html.Ul([
+                html.Li(id="max", style={}),
+                html.Li(id="min", style={}),])
                     ],
-                    style={'border': '2px solid #ccc', 'padding': '8px','backgroundColor': 'black'}
+                    style=info_box_style
                 )
-            ],
-            style={'width': '70%', 'display': 'inline-block','backgroundColor': 'black'}
-        )
-    ],
-    style={'backgroundColor': 'black'}
-)
+                ])
+    ]
+    )
 
 @app.callback(
     Output(component_id='timeline', component_property='figure'),
