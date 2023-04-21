@@ -21,15 +21,17 @@ dropdown_style = {
     'color': 'black',
     'backgroundColor': 'white',
     'border': '1px solid black',
-    'width': '800px',
-    'fontFamily': "Open Sans"
+    'width': '817px',
+    'fontFamily': "Open Sans",
+    "font-weight" : "bold"
 }
 info_box_style = {
     'border': '1px solid black',
     'padding': '8px',
     'backgroundColor': 'white',
     'width': '300px',
-    'fontFamily': 'Open Sans'
+    'fontFamily': 'Open Sans',
+    "font-weight" : "bold"
 }
 graph = {
     'border': '1px solid black',
@@ -47,15 +49,16 @@ app.layout = html.Div(
         html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}),
         html.Div(
             children=[
-        html.H2("Wählen Sie die zu untersuchende Aktie aus:"),
+        html.H2("Wählen Sie die zu untersuchende Aktie aus:", style={"padding": "10px 20px 10px 20px",'fontFamily': "Open Sans","text-decoration": "underline" } ),
         dcc.Dropdown(
             id='aktien-dropdown',
             options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
             value=assets[0]
         )], style=dropdown_style),
+        html.Hr(style={'border-top': '4px solid black'}),
         html.Div(
             children=[
-                dcc.Graph(id="timeline", style= graph)
+                dcc.Graph(id="timeline", style= graph)])
                 ,
         html.Div(
             children=[
@@ -66,7 +69,7 @@ app.layout = html.Div(
                     ],
                     style=info_box_style
                 )
-                ])
+                
     ]
     )
 
@@ -78,7 +81,7 @@ def update_output_div(input_value):
     msft = yf.Ticker(input_value)
     df= msft.history(period="max")
     df.reset_index(inplace= True)
-    figure= px.line(df, x="Date", y="Open")
+    figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie")
     return figure
 
 #Bearbeitung des Heads
@@ -87,7 +90,7 @@ def update_output_div(input_value):
     Input(component_id='aktien-dropdown', component_property='value')
 )
 def update_output_div(input_value):
-    return 'Verlauf der {} Aktie'.format(input_value)
+    return "Untersuchung der {} Aktie".format(input_value)
 
 #Bearbeitung der Info BOx
 @app.callback(
