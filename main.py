@@ -49,7 +49,7 @@ app.layout = html.Div(
         html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}),
         html.Div(
             children=[
-        html.H2("Wählen Sie die zu untersuchende Aktie aus:", style={"padding": "10px 20px 10px 20px",'fontFamily': "Open Sans","text-decoration": "underline" } ),
+        html.Label("Wählen Sie die zu untersuchende Aktie aus:", style={"padding": "10px 20px 10px 20px",'fontFamily': "Open Sans","text-decoration": "underline" } ),
         dcc.Dropdown(
             id='aktien-dropdown',
             options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
