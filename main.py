@@ -62,10 +62,15 @@ app.layout = html.Div(
                 ,
         html.Div(
             children=[
-                html.H2('Informationen', style={}),
+                html.Label('Informationen:', style={'fontFamily': "Open Sans", "text-decoration": "underline" }),
                 html.Ul([
+                dcc.Checklist(["Maximum", "Minimum", "Average"],
+                  ["Maximum", "Minimum", "Average"],id= "checkbox",inline=True),
+                html.Hr(),
                 html.Li(id="max", style={}),
-                html.Li(id="min", style={}),])
+                html.Li(id="min", style={}),
+                html.Li(id="average", style={})
+                ])
                     ],
                     style=info_box_style
                 )
@@ -90,30 +95,50 @@ def update_output_div(input_value):
     Input(component_id='aktien-dropdown', component_property='value')
 )
 def update_output_div(input_value):
-    return "Untersuchung der {} Aktie".format(input_value)
+    return "Untersuchung der {} Aktie".format(aktien[assets.index(input_value)])
 
 #Bearbeitung der Info BOx
 @app.callback(
     Output(component_id='max', component_property='children'),
-    Input(component_id='aktien-dropdown', component_property='value')
+    Input(component_id='aktien-dropdown', component_property='value'),
+    Input(component_id="checkbox", component_property="value")
 )
-def update_output_div(input_value):
-    msft = yf.Ticker(input_value)
-    df= msft.history(period="max")
-    df.reset_index(inplace= True)  
-
-    return 'All Time High: {} Dollar.'.format(round(df["Open"].max(),2 ))
+def update_output_div(input_value,checkbox):
+    if "Maximum" in checkbox:
+        msft = yf.Ticker(input_value)
+        df= msft.history(period="max")
+        df.reset_index(inplace= True)  
+        return 'All Time High: {} Dollar.'.format(round(df["Open"].max(),2 ))
+    else:
+        return ""
 
 @app.callback(
     Output(component_id='min', component_property='children'),
-    Input(component_id='aktien-dropdown', component_property='value')
+    Input(component_id='aktien-dropdown', component_property='value'),
+    Input(component_id="checkbox", component_property="value")
 )
-def update_output_div(input_value):
-    msft = yf.Ticker(input_value)
-    df= msft.history(period="max")
-    df.reset_index(inplace= True)  
+def update_output_div(input_value,checkbox):
+    if "Minimum" in checkbox:
+        msft = yf.Ticker(input_value)
+        df= msft.history(period="max")
+        df.reset_index(inplace= True)  
+        return 'All Time Low: {} Dollar.'.format(round(df["Open"].min(),2 ))
+    else:
+        return 
 
-    return 'All Time Low: {} Dollar.'.format(round(df["Open"].min(),2 ))
+@app.callback(
+    Output(component_id='average', component_property='children'),
+    Input(component_id='aktien-dropdown', component_property='value'),
+    Input(component_id="checkbox", component_property="value")
+)
+def update_output_div(input_value,checkbox):
+    if "Average" in checkbox:
+        msft = yf.Ticker(input_value)
+        df= msft.history(period="max")
+        df.reset_index(inplace= True)  
+        return 'Average: {} Dollar.'.format(round(df["Open"].mean(),2 ))
+    else:
+        return 
     
 
 # Starte die App
