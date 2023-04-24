@@ -100,6 +100,7 @@ def update_output_div(input_value):
     return "Untersuchung der {} Aktie".format(aktien[assets.index(input_value)])
 
 #Bearbeitung der Info Box
+#Checkbox ob Max Wert angezeigt werden soll
 @app.callback(
     Output(component_id='max', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value'),
