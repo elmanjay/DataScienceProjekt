@@ -10,8 +10,7 @@ import plotly.express as px
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
 aktien = ["Amazon","Google","Tesla","Microsoft"]
 
-# CSS-Stile
-external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap']
+
 
 colors = {
     'background': '#111111',
@@ -21,7 +20,6 @@ dropdown_style = {
     'color': 'black',
     'backgroundColor': 'white',
     'border': '1px solid black',
-    'width': '817px',
     'fontFamily': "Open Sans",
     "font-weight" : "bold"
 }
@@ -29,7 +27,6 @@ info_box_style = {
     'border': '1px solid black',
     'padding': '8px',
     'backgroundColor': 'white',
-    'width': '300px',
     'fontFamily': 'Open Sans',
     "font-weight" : "bold",
 }
@@ -37,31 +34,50 @@ graph = {
     'border': '1px solid black',
     'padding': '8px',
     'backgroundColor': 'white',
-    'width': '800px',
     'fontFamily': "Open Sans"  
 }
 
+# CSS-Stile
+external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap',
+                        'https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'
+                        ]
+# Bootstrap Design
+external_scripts = ['https://code.jquery.com/jquery-1.12.4.min.js',
+                    'https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'
+                    ]
+
 
 # Erstelle das Dash-Layout
-app = dash.Dash(__name__)
+app = dash.Dash(__name__,
+                external_scripts=external_scripts,
+                external_stylesheets=external_stylesheets)
 app.layout = html.Div(
+    className="container",
     children=[
-        html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}),
-        html.Div(
+    html.Div(
+            className="row",
             children=[
-        html.Label("Wählen Sie die zu untersuchende Aktie aus:", style={"padding": "10px 20px 10px 20px",'fontFamily': "Open Sans","text-decoration": "underline" } ),
+        html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}, className="col-md-12"),
+        html.Div(
+            className="col-md-10 col-md-offset-1",
+            children=[
+        html.Label("Wählen Sie die zu untersuchende Aktie aus:", style={'fontFamily': "Open Sans","text-decoration": "underline" } ),
         dcc.Dropdown(
             id='aktien-dropdown',
             options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
             value=assets[0]
-        )], style=dropdown_style),
-        html.Hr(style={'border-top': '4px solid black'}),
-        html.Div( children=[
-            html.Div(
+        )], style=dropdown_style)]),
+         html.Div(
+                className="row",
                 children=[
-                    dcc.Graph(id="timeline", style= graph)])
+        html.Hr( className="col-md-12", style={'border-top': '4px solid black'}),
+            html.Div(
+                className="col-md-7 col-md-offset-1",
+                children=[
+                    dcc.Graph(id="timeline",style= graph)])
                     ,
             html.Div(
+                className="col-md-3",
                 children=[
                     html.Label('Informationen:', style={'fontFamily': "Open Sans", "text-decoration": "underline" }),
                     html.Ul([
@@ -74,7 +90,8 @@ app.layout = html.Div(
                     ])
                         ],
                         style=info_box_style
-                    )],style= {"display":"flex"})
+                    )]#,style= {"display":"flex"}
+                    )
                 
                 
     ]
