@@ -78,7 +78,7 @@ app.layout = html.Div(
                 
     ]
     )
-
+#Anpassen des Plotts
 @app.callback(
     Output(component_id='timeline', component_property='figure'),
     Input(component_id='aktien-dropdown', component_property='value')
@@ -90,7 +90,7 @@ def update_output_div(input_value):
     figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie")
     return figure
 
-#Bearbeitung des Heads
+#Bearbeitung des Heads entsprechend der ausgewählten Aktie
 @app.callback(
     Output(component_id='head', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value')
@@ -98,7 +98,7 @@ def update_output_div(input_value):
 def update_output_div(input_value):
     return "Untersuchung der {} Aktie".format(aktien[assets.index(input_value)])
 
-#Bearbeitung der Info BOx
+#Checkbox ob Max Wert angezeibgt werden soll
 @app.callback(
     Output(component_id='max', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value'),
@@ -112,7 +112,7 @@ def update_output_div(input_value,checkbox):
         return 'All Time High: {} Dollar.'.format(round(df["Open"].max(),2 ))
     else:
         return ""
-
+#Checkbox ob Min Wert angezeigt werden soll
 @app.callback(
     Output(component_id='min', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value'),
@@ -126,7 +126,7 @@ def update_output_div(input_value,checkbox):
         return 'All Time Low: {} Dollar.'.format(round(df["Open"].min(),2 ))
     else:
         return 
-
+#Checkbox ob Average Wert angezeigt werden soll
 @app.callback(
     Output(component_id='average', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value'),
