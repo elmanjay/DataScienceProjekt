@@ -31,10 +31,11 @@ info_box_style = {
     "font-weight" : "bold",
 }
 graph = {
-    'border': '1px solid black',
+    #'border': '1px solid black',
     'padding': '8px',
     'backgroundColor': 'white',
-    'fontFamily': "Open Sans"  
+    'fontFamily': "Open Sans",
+    #'width': '800'  
 }
 
 # CSS-Stile
@@ -52,7 +53,7 @@ app = dash.Dash(__name__,
                 external_scripts=external_scripts,
                 external_stylesheets=external_stylesheets)
 app.layout = html.Div(
-    className="container",
+    className="container-fluid",
     children=[
     html.Div(
             className="row",
