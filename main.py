@@ -8,7 +8,7 @@ import plotly.express as px
 
 # Erstellen Sie ein Objekt für das zu beobachtende Unternehmen
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
-aktien = ["Amazon","Googel","Tesla","Microsoft"]
+aktien = ["Amazon","Google","Tesla","Microsoft"]
 
 # CSS-Stile
 external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap']
@@ -31,7 +31,7 @@ info_box_style = {
     'backgroundColor': 'white',
     'width': '300px',
     'fontFamily': 'Open Sans',
-    "font-weight" : "bold"
+    "font-weight" : "bold",
 }
 graph = {
     'border': '1px solid black',
@@ -70,6 +70,7 @@ app.layout = html.Div(
                     style=info_box_style
                 )
                 
+                
     ]
     )
 
@@ -92,7 +93,7 @@ def update_output_div(input_value):
 def update_output_div(input_value):
     return "Untersuchung der {} Aktie".format(input_value)
 
-#Bearbeitung der Info BOx
+#Bearbeitung der Info Box
 @app.callback(
     Output(component_id='max', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value')
