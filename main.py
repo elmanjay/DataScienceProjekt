@@ -8,7 +8,7 @@ import plotly.express as px
 
 # Erstellen Sie ein Objekt für das zu beobachtende Unternehmen
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
-aktien = ["Amazon","Googel","Tesla","Microsoft"]
+aktien = ["Amazon","Google","Tesla","Microsoft"]
 
 # CSS-Stile
 external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap']
@@ -56,24 +56,25 @@ app.layout = html.Div(
             value=assets[0]
         )], style=dropdown_style),
         html.Hr(style={'border-top': '4px solid black'}),
-        html.Div(
-            children=[
-                dcc.Graph(id="timeline", style= graph)])
-                ,
-        html.Div(
-            children=[
-                html.Label('Informationen:', style={'fontFamily': "Open Sans", "text-decoration": "underline" }),
-                html.Ul([
-                dcc.Checklist(["Maximum", "Minimum", "Average"],
-                  ["Maximum", "Minimum", "Average"],id= "checkbox",inline=True),
-                html.Hr(),
-                html.Li(id="max", style={}),
-                html.Li(id="min", style={}),
-                html.Li(id="average", style={})
-                ])
-                    ],
-                    style=info_box_style
-                )
+        html.Div( children=[
+            html.Div(
+                children=[
+                    dcc.Graph(id="timeline", style= graph)])
+                    ,
+            html.Div(
+                children=[
+                    html.Label('Informationen:', style={'fontFamily': "Open Sans", "text-decoration": "underline" }),
+                    html.Ul([
+                    dcc.Checklist(["Maximum", "Minimum", "Average"],
+                    ["Maximum", "Minimum", "Average"],id= "checkbox",inline=True),
+                    html.Hr(),
+                    html.Li(id="max", style={}),
+                    html.Li(id="min", style={}),
+                    html.Li(id="average", style={})
+                    ])
+                        ],
+                        style=info_box_style
+                    )],style= {"display":"flex"})
                 
     ]
     )
