@@ -74,9 +74,8 @@ app.layout = html.Div(
                     ])
                         ],
                         style=info_box_style
-                    )],style= {"display":"flex"})
-                
-    ]
+                    )],style= {"display":"flex"},
+            ]
     )
 #Anpassen des Plotts
 @app.callback(
@@ -89,6 +88,7 @@ def update_output_div(input_value):
     df.reset_index(inplace= True)
     figure= px.line(df, x="Date", y="Kurs", title="Verlauf der Aktie")
     return figure
+
 
 #Bearbeitung des Heads entsprechend der ausgewählten Aktie
 @app.callback(
@@ -141,7 +141,7 @@ def update_output_div(input_value,checkbox):
     else:
         return 
     
-
+#Erstellen des Candle Chart
 # Starte die App
 if __name__ == '__main__':
     app.run_server(debug=True)
