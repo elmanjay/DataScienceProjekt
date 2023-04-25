@@ -65,7 +65,7 @@ app.layout = html.Div(
             {'label': '3 Monate', 'value': '3'},
             {'label': '6 Monate', 'value': '6'},
             {'label': 'Gesamter Verlauf', 'value': 'all'}
-        ],value='3') ],style= {'border': '1px solid black',}),
+        ],value='3') ],style= dropdown_style),
         html.Div( children=[
             html.Div(
                 children=[
