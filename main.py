@@ -22,7 +22,7 @@ dropdown_style = {
     'color': 'black',
     'backgroundColor': 'white',
     'border': '1px solid black',
-    'width': "1008px",
+    'width': "1130px",
     'fontFamily': "Open Sans",
     "font-weight" : "bold"
 }
