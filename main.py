@@ -101,6 +101,8 @@ def update_output_div(input_value, date_range):
         df= msft.history(period="max")
     df.reset_index(inplace= True)
     figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie")
+    figure.update_xaxes(title_text="Datum")
+    figure.update_yaxes(title_text="Eröffnungskurs")
     return figure
 
 #Bearbeitung des Heads entsprechend der ausgewählten Aktie
