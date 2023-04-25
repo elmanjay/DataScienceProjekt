@@ -10,7 +10,8 @@ import plotly.express as px
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
 aktien = ["Amazon","Google","Tesla","Microsoft"]
 
-
+# CSS-Stile
+external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap']
 
 colors = {
     'background': '#111111',
@@ -20,6 +21,7 @@ dropdown_style = {
     'color': 'black',
     'backgroundColor': 'white',
     'border': '1px solid black',
+    'width': '817px',
     'fontFamily': "Open Sans",
     "font-weight" : "bold"
 }
@@ -27,58 +29,39 @@ info_box_style = {
     'border': '1px solid black',
     'padding': '8px',
     'backgroundColor': 'white',
+    'width': '300px',
     'fontFamily': 'Open Sans',
-    "font-weight" : "bold",
+    "font-weight" : "bold"
 }
 graph = {
-    #'border': '1px solid black',
+    'border': '1px solid black',
     'padding': '8px',
     'backgroundColor': 'white',
-    'fontFamily': "Open Sans",
-    #'width': '800'  
+    'width': '800px',
+    'fontFamily': "Open Sans"  
 }
-
-# CSS-Stile
-external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap',
-                        'https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'
-                        ]
-# Bootstrap Design
-external_scripts = ['https://code.jquery.com/jquery-1.12.4.min.js',
-                    'https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'
-                    ]
 
 
 # Erstelle das Dash-Layout
-app = dash.Dash(__name__,
-                external_scripts=external_scripts,
-                external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__)
 app.layout = html.Div(
-    className="container-fluid",
     children=[
-    html.Div(
-            className="row",
-            children=[
-        html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}, className="col-md-12"),
+        html.H1('Text', id="head", style={'textAlign': 'center','fontFamily': 'Open Sans'}),
         html.Div(
-            className="col-md-10 col-md-offset-1",
             children=[
-        html.Label("Wählen Sie die zu untersuchende Aktie aus:", style={'fontFamily': "Open Sans","text-decoration": "underline" } ),
+        html.Label("Wählen Sie die zu untersuchende Aktie aus:", style={"padding": "10px 20px 10px 20px",'fontFamily': "Open Sans","text-decoration": "underline" } ),
         dcc.Dropdown(
             id='aktien-dropdown',
             options=[{'label': j, 'value': aktie} for j, aktie in zip(aktien, assets)],
             value=assets[0]
-        )], style=dropdown_style)]),
-         html.Div(
-                className="row",
-                children=[
-        html.Hr( className="col-md-12", style={'border-top': '4px solid black'}),
+        )], style=dropdown_style),
+        html.Hr(style={'border-top': '4px solid black'}),
+        html.Div( children=[
             html.Div(
-                className="col-md-7 col-md-offset-1",
                 children=[
-                    dcc.Graph(id="timeline",style= graph)])
+                    dcc.Graph(id="timeline", style= graph)])
                     ,
             html.Div(
-                className="col-md-3",
                 children=[
                     html.Label('Informationen:', style={'fontFamily': "Open Sans", "text-decoration": "underline" }),
                     html.Ul([
@@ -91,9 +74,7 @@ app.layout = html.Div(
                     ])
                         ],
                         style=info_box_style
-                    )]#,style= {"display":"flex"}
-                    )
-                
+                    )],style= {"display":"flex"})
                 
     ]
     )
@@ -117,8 +98,7 @@ def update_output_div(input_value):
 def update_output_div(input_value):
     return "Untersuchung der {} Aktie".format(aktien[assets.index(input_value)])
 
-#Bearbeitung der Info Box
-#Checkbox ob Max Wert angezeigt werden soll
+#Checkbox ob Max Wert angezeibgt werden soll
 @app.callback(
     Output(component_id='max', component_property='children'),
     Input(component_id='aktien-dropdown', component_property='value'),
