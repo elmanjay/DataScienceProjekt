@@ -99,7 +99,7 @@ def update_output_div(input_value, date_range):
     else: 
         df= msft.history(period="max")
     df.reset_index(inplace= True)
-    figure= px.line(df, x="Date", y="Kurs", title="Verlauf der Aktie")
+    figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie")
     return figure
 
 
