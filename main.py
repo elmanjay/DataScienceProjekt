@@ -1,9 +1,6 @@
 import pandas as pd
 import yfinance as yf
 import dash
-import pytz
-import numpy as np
-import datetime
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
