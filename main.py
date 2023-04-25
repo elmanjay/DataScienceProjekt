@@ -7,14 +7,15 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 
 # Erstellen Sie ein Objekt für das zu beobachtende Unternehmen
-assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
-aktien = ["Amazon","Google","Tesla","Microsoft"]
+
+assets = ["AAPL", "GOOGL", "TSLA", "MSFT", "ADS.DE", "BAYN.DE", "BMW.DE", "DAI.DE", "BTC-USD", "ETH-USD", "DOGE-USD", "XRP-USD"]
+aktien = ["Amazon", "Google", "Tesla", "Microsoft", "Adidas AG", "Bayer AG", "Bayerische Motoren Werke AG", "Daimler AG", "Bitcoin", "Ethereum", "Dogecoin", "XRP"]
 
 # CSS-Stile
 external_stylesheets = ['https://fonts.googleapis.com/css?family=Open+Sans&display=swap']
 
 colors = {
-    'background': '#111111',
+    'background': '#0000FF',
     'text': '#7FDBFF'
 }
 dropdown_style = {
@@ -83,9 +84,8 @@ app.layout = html.Div(
                     ])
                         ],
                         style=info_box_style
-                    )],style= {"display":"flex"})
-                
-    ]
+                    )],style= {"display":"flex"},
+            ]
     )
 #Anpassen des Plotts
 @app.callback(
@@ -104,6 +104,7 @@ def update_output_div(input_value, date_range):
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Eröffnungskurs")
     return figure
+
 
 #Bearbeitung des Heads entsprechend der ausgewählten Aktie
 @app.callback(
@@ -156,7 +157,7 @@ def update_output_div(input_value,checkbox):
     else:
         return 
     
-
+#Erstellen des Candle Chart
 # Starte die App
 if __name__ == '__main__':
     app.run_server(debug=True)
