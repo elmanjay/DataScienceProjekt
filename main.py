@@ -1,6 +1,9 @@
 import pandas as pd
 import yfinance as yf
 import dash
+import pytz
+import numpy as np
+import datetime
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
@@ -57,6 +60,15 @@ app.layout = html.Div(
         )], style=dropdown_style),
         html.Hr(style={'border-top': '4px solid black'}),
         html.Div( children=[
+        html.Label('Zeitraum:', style={'fontFamily': "Open Sans", "text-decoration": "underline","font-weight" : "bold" }),
+        dcc.Dropdown(
+        id='date-checklist',
+        options=[
+            {'label': '3 Monate', 'value': '3'},
+            {'label': '6 Monate', 'value': '6'},
+            {'label': 'Gesamter Verlauf', 'value': 'all'}
+        ],value='3') ],style= {'border': '1px solid black',}),
+        html.Div( children=[
             html.Div(
                 children=[
                     dcc.Graph(id="timeline", style= graph)])
@@ -81,11 +93,15 @@ app.layout = html.Div(
 #Anpassen des Plotts
 @app.callback(
     Output(component_id='timeline', component_property='figure'),
-    Input(component_id='aktien-dropdown', component_property='value')
+    Input(component_id='aktien-dropdown', component_property='value'),
+    Input(component_id="date-checklist", component_property='value' )
 )
-def update_output_div(input_value):
+def update_output_div(input_value, date_range):
     msft = yf.Ticker(input_value)
-    df= msft.history(period="max")
+    if date_range != "all":
+        df= msft.history(period=str(date_range)+"mo")
+    else: 
+        df= msft.history(period="max")
     df.reset_index(inplace= True)
     figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie")
     return figure
