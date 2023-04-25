@@ -84,7 +84,7 @@ app.layout = html.Div(
                     ])
                         ],
                         style=info_box_style
-                    )],style= {"display":"flex"},
+                    )],style= {"display":"flex"},)
             ]
     )
 #Anpassen des Plotts
