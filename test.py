@@ -22,8 +22,7 @@ external_stylesheets = [    {        'external_url': 'https://fonts.googleapis.c
 
 app.layout = html.Div([
     html.H1('Mein Dashboard', style={'font-family': 'SF Pro Display'}),
-    dcc.RadioItems(
-    id="zeitraum",
+    dcc.RadioItems(id="zeitraum",
     options=[
         {'label': "Max", 'value': "max"},
         {'label': "Letzte 3 Monate", 'value': 3},
