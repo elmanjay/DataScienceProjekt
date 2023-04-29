@@ -22,11 +22,17 @@ external_stylesheets = [    {        'external_url': 'https://fonts.googleapis.c
 
 app.layout = html.Div([
     html.H1('Mein Dashboard', style={'font-family': 'SF Pro Display'}),
-    #dcc.RadioItems( options=[
-       # {'label': "Max", "value": 3},
-       # {'label': "Letzte 3 Monate", "value": 6},
-       # {'label': "Letzte 6 Monate", "value": len(df["Date"].unique())}],
-          #"Max", id= "zeitraum",inline= True),
+    dcc.RadioItems(
+    id="zeitraum",
+    options=[
+        {'label': "Max", 'value': "max"},
+        {'label': "Letzte 3 Monate", 'value': 3},
+        {'label': "Letzte 6 Monate", 'value': 6}
+    ],
+    value="max",
+    className="radio-buttons",
+    labelStyle={'display': 'inline-block', 'margin-right': '10px'}
+),
     dcc.Graph(id="graph"),
     html.Table(id="table"),
     dcc.Dropdown(id="aktien-dropdown", options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
