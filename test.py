@@ -30,7 +30,7 @@ app.layout = html.Div([
           #"Max", id= "zeitraum",inline= True),
     dcc.Graph(id="graph"),
     html.Table(id="table"),
-    dcc.Dropdown(id="aktien-,dropdown", options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
+    dcc.Dropdown(id="aktien-dropdown", options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
             value=assets[0]),
     dcc.Graph(id="graph2"),
 
