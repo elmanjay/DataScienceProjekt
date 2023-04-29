@@ -14,9 +14,8 @@ aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
 
 app = dash.Dash(__name__)
 
-app.css.append_css({
-    'external_url': 'https://fonts.googleapis.com/css?family=SF+Pro+Display:400,600,700'
-})
+external_stylesheets = [    {        'external_url': 'https://fonts.googleapis.com/css?family=SF+Pro+Display:400,600,700'    }]
+
 
 
 
