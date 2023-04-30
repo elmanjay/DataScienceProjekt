@@ -4,6 +4,7 @@ import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
 import plotly.express as px
 from backend import decompose
 
@@ -12,29 +13,33 @@ from backend import decompose
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
 aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
 
-app = dash.Dash(__name__)
-
-external_stylesheets = [    {        'external_url': 'https://fonts.googleapis.com/css?family=SF+Pro+Display:400,600,700'    }]
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX])
 
 
 
 
 
-app.layout = html.Div([
-    html.H1('Mein Dashboard', style={'font-family': 'SF Pro Display'}),
-    dcc.RadioItems(id="zeitraum",
+app.layout = dbc.Container([
+    dbc.Row([
+             dbc.Col(
+        html.H1("Mein Dashboard", className="text-center text-primary" ),
+                    )
+    ]),
+    dbc.Row([
+             dbc.Col(
+    dbc.RadioItems(id="zeitraum", 
     options=[
         {'label': "Max", 'value': "max"},
         {'label': "Letzte 3 Monate", 'value': 3},
         {'label': "Letzte 6 Monate", 'value': 6}
     ],
     value="max",
-    className="radio-buttons",
+    className="btn-group btn-group-sms",
     labelStyle={'display': 'inline-block', 'margin-right': '10px'}
-),
-    dcc.Graph(id="graph"),
+),)]),
+    dcgtc.Graph(id="graph"),
     html.Table(id="table"),
-    dcc.Dropdown(id="aktien-dropdown",
+    dbc.Dropdown(id="aktien-dropdown",
                   options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
                 placeholder="Bitte wälen Sie eine Aktie"),
     dcc.Graph(id="graph2"),
