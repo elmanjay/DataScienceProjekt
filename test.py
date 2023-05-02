@@ -21,10 +21,15 @@ app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX])
 
 app.layout = dbc.Container([
     dbc.Row([
-             dbc.Col(
-        html.H1("Mein Dashboard", className="text-center text-primary" ),
-                    )
-    ]),
+    dbc.Navbar(
+        [
+            dbc.NavbarBrand("Mein Dashboard"),
+            dbc.NavItem(dbc.NavLink("Home", href="#")),
+            dbc.NavItem(dbc.NavLink("Über uns", href="#")),
+        ],
+        color="primary",
+        dark=True,
+    ),]),
     dbc.Row([
              dbc.Col(
     dbc.RadioItems(id="zeitraum", 
@@ -46,7 +51,7 @@ app.layout = dbc.Container([
 
     # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data")
-])
+],fluid=True)
 
 @app.callback(Output("basic-data", "data"), Input("aktien-dropdown", "value"))
 def clean_data(value):
