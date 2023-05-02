@@ -21,7 +21,7 @@ dash.register_page(__name__, path='/')
 
 layout = dbc.Container([
     dbc.Row([
-             dbc.Col(
+             dbc.Col([
     dbc.RadioItems(id="zeitraum", 
     options=[
         {'label': "Max", 'value': "max"},
@@ -30,9 +30,20 @@ layout = dbc.Container([
     ],
     value="max",
     className="radiobuttons",
-    labelStyle={'display': 'inline-block', 'margin-right': '10px'}
-),)]),
-    dcc.Graph(id="graph"),
+    labelStyle={'display': 'inline-block', 'margin-right': '10px'},
+    inline= True),
+    dcc.Graph(id="graph")],
+            width= 6),
+
+    dbc.Col([
+        html.Div( 
+    children= [
+        html.H2("Aktuelle Marktdaten:", className= "card-header"),
+        html.Content("test eijfjfosjfsjdojesdjsjefosjdlsejflsej",className= "card-text"),
+        html.P("test")
+    ], className= "card border-primary mb-3")])
+]),
+
     html.Table(id="table"),
     #dcc.Dropdown(id="aktien-dropdown",
       #            options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
