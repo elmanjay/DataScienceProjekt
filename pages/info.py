@@ -10,6 +10,7 @@ from backend import decompose
 
 
 
+
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
 aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
 
@@ -22,6 +23,9 @@ dash.register_page(__name__, path='/')
 layout = dbc.Container([
     dbc.Row([
              dbc.Col([
+                 html.Div([
+    html.H2("Verlauf der Aktie:", className= "card-header"),
+    html.Label("Bitte wählen Sie den gewünschten Zeitraum:"),
     dbc.RadioItems(id="zeitraum", 
     options=[
         {'label': "Max", 'value': "max"},
@@ -32,8 +36,9 @@ layout = dbc.Container([
     className="radiobuttons",
     labelStyle={'display': 'inline-block', 'margin-right': '10px'},
     inline= True),
-    dcc.Graph(id="graph")],
-            width= 6),
+    html.Hr(),
+    dcc.Graph(id="graph")], className= "card border-primary mb-3")],
+            ),
 
     dbc.Col([
         html.Div( 
