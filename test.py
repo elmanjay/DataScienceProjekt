@@ -23,13 +23,35 @@ app.layout = dbc.Container([
     dbc.Row([
     dbc.Navbar(
         [
-            dbc.NavbarBrand("Mein Dashboard"),
-            dbc.NavItem(dbc.NavLink("Home", href="#")),
-            dbc.NavItem(dbc.NavLink("Über uns", href="#")),
+            dbc.NavbarBrand("Aktien Analyse"),
+            dbc.NavItem(dbc.NavLink("Info", href="#")),
+            dbc.NavItem(dbc.NavLink("Regression", href="#")),
+            dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="#")),
+            dbc.NavItem(dbc.NavLink("LSTM", href="#")),
+            dbc.Col(
+                html.P(""),
+                width=2  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
+            ),
+            dbc.Col(
+                html.P("Aktie auswählen:", style={"margin-right": "10px"}),
+                width=1  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
+            ),
+            dbc.Col(
+                dcc.Dropdown(
+                    id="aktien-dropdown",
+                    options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
+                    placeholder="Bitte wählen Sie eine Aktie",
+                    style={"width": "300px","color": "black"}
+                ),
+                width=True   # Hier setzen wir die Breite der Dropdown-Spalte auf 6
+            ),
         ],
         color="primary",
         dark=True,
-    ),]),
+        style={"color": "white"}
+    ),
+]),
+
     dbc.Row([
              dbc.Col(
     dbc.RadioItems(id="zeitraum", 
@@ -44,9 +66,9 @@ app.layout = dbc.Container([
 ),)]),
     dcc.Graph(id="graph"),
     html.Table(id="table"),
-    dcc.Dropdown(id="aktien-dropdown",
-                  options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
-                placeholder="Bitte wälen Sie eine Aktie"),
+    #dcc.Dropdown(id="aktien-dropdown",
+      #            options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
+       #         placeholder="Bitte wälen Sie eine Aktie"),
     dcc.Graph(id="graph2"),
 
     # dcc.Store stores the intermediate value
