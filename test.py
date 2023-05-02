@@ -37,9 +37,9 @@ app.layout = dbc.Container([
     className="btn-group btn-group-sms",
     labelStyle={'display': 'inline-block', 'margin-right': '10px'}
 ),)]),
-    dcgtc.Graph(id="graph"),
+    dcc.Graph(id="graph"),
     html.Table(id="table"),
-    dbc.Dropdown(id="aktien-dropdown",
+    dcc.Dropdown(id="aktien-dropdown",
                   options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
                 placeholder="Bitte wälen Sie eine Aktie"),
     dcc.Graph(id="graph2"),
