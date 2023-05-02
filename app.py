@@ -23,7 +23,7 @@ app.layout = dbc.Container([
     dbc.Row([
     dbc.Navbar(
         [
-            dbc.NavbarBrand("Aktien Analyse"),
+            dbc.NavbarBrand("Aktien Analyse", className= "navbar-brand"),
             dbc.NavItem(dbc.NavLink("Info", href="/")),
             dbc.NavItem(dbc.NavLink("Regression", href="/lstm")),
             dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="#")),
@@ -50,6 +50,7 @@ app.layout = dbc.Container([
         dark=True,
         style={"color": "white"}
     ),
+    html.Hr(),
     dash.page_container,
         # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data")
@@ -67,7 +68,7 @@ def clean_data(value):
 @app.callback(Output("graph", "figure"), Input("basic-data", "data"),Input("zeitraum","value"))
 def update_graph(jsonified_cleaned_data, zeitraum):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
-    figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie")
+    figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie", template= "plotly_white")
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Kurs")
     return figure
