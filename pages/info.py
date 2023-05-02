@@ -21,35 +21,49 @@ dash.register_page(__name__, path='/')
 
 layout = dbc.Container([
     dbc.Row([
-             dbc.Col([
-    dbc.RadioItems(id="zeitraum", 
-    options=[
-        {'label': "Max", 'value': "max"},
-        {'label': "Letzte 3 Monate", 'value': 3},
-        {'label': "Letzte 6 Monate", 'value': 6}
-    ],
-    value="max",
-    className="radiobuttons",
-    labelStyle={'display': 'inline-block', 'margin-right': '10px'},
-    inline= True),
-    dcc.Graph(id="graph")],
-            width= 6),
+        dbc.Col([
+            dbc.RadioItems(id="zeitraum", 
+                options=[
+                    {'label': "Max", 'value': "max"},
+                    {'label': "Letzte 3 Monate", 'value': 3},
+                    {'label': "Letzte 6 Monate", 'value': 6}
+                ],
+                value="max",
+                className="radiobuttons",
+                labelStyle={'display': 'inline-block', 'margin-right': '10px'},
+                inline=True
+            ),
+            dcc.Graph(id="graph")
+        ], width=6),
 
-    dbc.Col([
-        html.Div( 
-    children= [
-        html.H2("Aktuelle Marktdaten:", className= "card-header"),
-        html.Content("test eijfjfosjfsjdojesdjsjefosjdlsejflsej",className= "card-text"),
-        html.P("test")
-    ], className= "card border-primary mb-3")])
-]),
+        dbc.Col([
+            html.Div( 
+                children=[
+                    html.H2("Marktdaten:", className="card-header"),
+                    html.Div(
+                        children=[
+                            html.H3("Aktuelle Marktdaten"),
+                            html.P("This is box 1 content")
+                        ],
+                        className="border-primary btn-close"
+                    ),
+                    html.Div(
+                        children=[
+                            html.H3("Historische Marktdaten"),
+                            html.P("This is box 2 content")
+                        ],
+                        className="border-primary btn-close"
+                    )
+                ], 
+                className="card border-primary mb-3"
+            )
+        ])
+    ]),
 
     html.Table(id="table"),
-    #dcc.Dropdown(id="aktien-dropdown",
-      #            options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
-       #         placeholder="Bitte wälen Sie eine Aktie"),
+
     dcc.Graph(id="graph2"),
 
-    # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data")
-],fluid=True)
+], fluid=True)
+
