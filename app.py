@@ -23,7 +23,7 @@ app.layout = dbc.Container([
     dbc.Row([
     dbc.Navbar(
         [
-            dbc.NavbarBrand("Aktien Analyse", className= "navbar-brand"),
+            dbc.NavbarBrand("Aktien Analyse", className= "navbar-brand",style={"margin-left": "10px"}),
             dbc.NavItem(dbc.NavLink("Info", href="/")),
             dbc.NavItem(dbc.NavLink("Regression", href="/lstm")),
             dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="#")),

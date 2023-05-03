@@ -25,7 +25,7 @@ layout = dbc.Container([
              dbc.Col([
                  html.Div([
     html.H2("Verlauf der Aktie:", className= "card-header"),
-    html.Label("Bitte wählen Sie den gewünschten Zeitraum:"),
+    html.Label("Bitte wählen Sie den gewünschten Zeitraum:", style={"margin-left": "10px"}),
     dbc.RadioItems(id="zeitraum", 
     options=[
         {'label': "Max", 'value': "max"},
@@ -34,7 +34,8 @@ layout = dbc.Container([
     ],
     value="max",
     className="radiobuttons",
-    labelStyle={'display': 'inline-block', 'margin-right': '10px'},
+    labelStyle={'display': 'inline-block', 'margin-right': '5px'},
+    style={"margin-left": "10px"},
     inline= True),
     html.Hr(),
     dcc.Graph(id="graph")], className= "card border-primary mb-3")],
