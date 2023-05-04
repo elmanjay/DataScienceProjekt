@@ -26,11 +26,11 @@ app.layout = dbc.Container([
             dbc.NavbarBrand("Aktien Analyse", className= "navbar-brand",style={"margin-left": "10px"}),
             dbc.NavItem(dbc.NavLink("Info", href="/")),
             dbc.NavItem(dbc.NavLink("Regression", href="/lstm")),
-            dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="#")),
+            dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="/zeitreihe")),
             dbc.NavItem(dbc.NavLink("LSTM", href="#")),
             dbc.Col(
                 html.P(""),
-                width=2  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
+                width=4  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
             ),
             dbc.Col(
                 html.P("Aktie auswählen:", style={"margin-right": "10px"}),
@@ -64,22 +64,6 @@ def clean_data(value):
         df = msft.history(period="max")
         df.reset_index(inplace= True)
         return df.to_json(date_format="iso", orient="split")
-
-@app.callback(Output("graph", "figure"), Input("basic-data", "data"),Input("zeitraum","value"))
-def update_graph(jsonified_cleaned_data, zeitraum):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
-    figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie", template= "plotly_white")
-    figure.update_xaxes(title_text="Datum")
-    figure.update_yaxes(title_text="Kurs")
-    return figure
-
-@app.callback(Output("graph2", "figure"), Input("basic-data", "data"))
-def decomposition_plot(jsonified_cleaned_data):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
-    decomposition = decompose(df)
-    figure= px.line(decomposition, x="Date", y=["Trend", "Saison", "Rauschen"], title="Multiplikative Dekomposition")
-    return figure
-
 
 
 # Starte die App
