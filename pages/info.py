@@ -10,10 +10,6 @@ from backend import decompose
 
 
 
-
-assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
-aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
-
 dash.register_page(__name__, path='/')
 
 
@@ -51,9 +47,7 @@ layout = dbc.Container([
 ]),
 
     html.Table(id="table"),
-    #dcc.Dropdown(id="aktien-dropdown",
-      #            options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
-       #         placeholder="Bitte wälen Sie eine Aktie"),
+   
     dcc.Graph(id="graph2"),
 
     # dcc.Store stores the intermediate value
