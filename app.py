@@ -30,7 +30,7 @@ app.layout = dbc.Container([
             dbc.NavItem(dbc.NavLink("LSTM", href="#")),
             dbc.Col(
                 html.P(""),
-                width=4  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
+                width=2  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
             ),
             dbc.Col(
                 html.P("Aktie auswählen:", style={"margin-right": "10px"}),
