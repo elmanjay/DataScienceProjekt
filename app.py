@@ -54,6 +54,7 @@ app.layout = dbc.Container([
     dash.page_container,
         # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data")
+    
 ]),
 ],fluid=True)
 

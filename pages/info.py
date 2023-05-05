@@ -7,7 +7,11 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from backend import decompose
+import datetime
+import locale
 
+now = datetime.datetime.now()
+locale.setlocale(locale.LC_TIME, 'de_DE')
 
 
 dash.register_page(__name__, path='/')
@@ -35,24 +39,24 @@ layout = dbc.Container([
     inline= True),
     html.Hr(),
     dcc.Graph(id="graph")], className= "card border-primary mb-3")],
-            ),
+            width=6),
 
     dbc.Col([
         html.Div( 
     children= [
         html.H2("Aktuelle Marktdaten:", className= "card-header"),
-        html.Content("test eijfjfosjfsjdojesdjsjefosjdlsejflsej",className= "card-text"),
-        html.P("test")
-    ], className= "card border-primary mb-3")])
+        html.Hr(),
+        html.H5(id="datumszeile-akt-markt"),
+        html.Br(),
+        html.Div(id="output-div-aktuellemarktdaten",style={"margin-left": "10px"}),
+    ], className= "card text-white bg-primary mb-3")], width=3),
+    dbc.Col([
+        html.Div( 
+    children= [
+        html.H2("Historische Daten:", className= "card-header"),
+
+    ], className= "card border-primary mb-3")], width=3)
 ]),
-
-    html.Table(id="table"),
-    #dcc.Dropdown(id="aktien-dropdown",
-      #            options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
-       #         placeholder="Bitte wälen Sie eine Aktie"),
-    dcc.Graph(id="graph2"),
-
-    # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data")
 ],fluid=True)
 
@@ -63,3 +67,32 @@ def update_graph(jsonified_cleaned_data, zeitraum):
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Kurs (USD)")
     return figure
+
+@dash.callback(Output("output-div-aktuellemarktdaten", "children"), Input("aktien-dropdown", "value"))
+
+def update_data(symbol):
+    stock_data = yf.Ticker(symbol)
+    data = stock_data.info
+    open_price = data['regularMarketOpen']
+    close_price = data['regularMarketPreviousClose']
+    low_price = data['regularMarketDayLow']
+    high_price = data['regularMarketDayHigh']
+    output = [
+        html.P("Open: {}$".format(open_price)),
+        html.P("Close: {}$".format(close_price)),
+        html.P("Low: {}$".format(low_price)),
+        html.P("High: {}$".format(high_price))
+    ]
+    return output
+
+@dash.callback(Output("datumszeile-akt-markt", "children"), Input("aktien-dropdown", "value"), Input("basic-data", "data"))
+
+def update_datum(symbol,jsonified_cleaned_data):
+    stock_data = yf.Ticker(symbol)
+    data = stock_data.info
+    open_price = data['regularMarketOpen']
+    df = pd.read_json(jsonified_cleaned_data, orient='split')
+    change_pct = (open_price - df["Close"].iloc[0]) / df["Close"].iloc[0] * 100
+    change_pct = round(change_pct,2)
+
+    return html.H5(("{}, {} : {}".format(now.strftime("%A"), now.date(),change_pct )),style={"margin-left": "10px"}, className= "font-weight-bold")
