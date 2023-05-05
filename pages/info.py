@@ -27,7 +27,7 @@ layout = dbc.Container([
              dbc.Col([
                  html.Div([
     html.H2("Verlauf der Aktie:", className= "card-header"),
-    html.Label("Bitte wählen Sie den gewünschten Zeitraum:", style={"margin-left": "10px"}),
+    html.Label("Bitte wählen Sie den gewünschten Zeitraum:", style={"margin-left": "10px"}, className= "font-weight-bold"),
     dbc.RadioItems(id="zeitraum", 
     options=[
         {'label': "3 Monate", 'value': 90},
@@ -87,10 +87,10 @@ def update_data(symbol):
     low_price = data['regularMarketDayLow']
     high_price = data['regularMarketDayHigh']
     output = [
-        html.P("Open: {}$".format(open_price)),
-        html.P("Close: {}$".format(close_price)),
-        html.P("Low: {}$".format(low_price)),
-        html.P("High: {}$".format(high_price))
+        html.P("Open: {}$".format(open_price), className= "font-weight-bold"),
+        html.P("Close: {}$".format(close_price), className= "font-weight-bold"),
+        html.P("Low: {}$".format(low_price), className= "font-weight-bold"),
+        html.P("High: {}$".format(high_price), className= "font-weight-bold")
     ]
     return output
 
