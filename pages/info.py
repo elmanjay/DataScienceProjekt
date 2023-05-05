@@ -37,7 +37,7 @@ layout = dbc.Container([
     labelStyle={'display': 'inline-block', 'margin-right': '5px'},
     style={"margin-left": "10px"},
     inline= True),
-    html.Hr(),
+    html.Hr(style={"margin-top": "0px"}),
     dcc.Graph(id="graph")], className= "card border-primary mb-3")],
             width=6),
 
@@ -45,10 +45,10 @@ layout = dbc.Container([
         html.Div( 
     children= [
         html.H2("Aktuelle Marktdaten:", className= "card-header"),
-        html.Hr(),
+        html.Hr(style={"margin-top": "0px"}),
         html.H5(id="datumszeile-akt-markt"),
-        html.Br(),
-        html.Div(id="output-div-aktuellemarktdaten",style={"margin-left": "10px"}),
+        html.Hr(style={"margin-top": "0px"}),
+        html.Table(id="output-div-aktuellemarktdaten",style={"margin-left": "10px"}),
     ], className= "card text-white bg-primary mb-3")], width=3),
     dbc.Col([
         html.Div( 

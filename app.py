@@ -63,6 +63,7 @@ def clean_data(value):
      if value:
         msft = yf.Ticker(value)
         df = msft.history(period="max")
+        pd.to_datetime(df["Date"])
         df.reset_index(inplace= True)
         return df.to_json(date_format="iso", orient="split")
 
