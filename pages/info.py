@@ -9,6 +9,8 @@ import plotly.express as px
 from backend import decompose
 import datetime
 import locale
+import pytz
+import numpy as np
 
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
@@ -28,11 +30,11 @@ layout = dbc.Container([
     html.Label("Bitte wählen Sie den gewünschten Zeitraum:", style={"margin-left": "10px"}),
     dbc.RadioItems(id="zeitraum", 
     options=[
-        {'label': "Max", 'value': "max"},
-        {'label': "Letzte 3 Monate", 'value': 3},
-        {'label': "Letzte 6 Monate", 'value': 6}
+        {'label': "3 Monate", 'value': 90},
+        {'label': "6 Monate", 'value': 180},
+        {'label': "Max", 'value': "max"}
     ],
-    value="max",
+    value=90,
     className="radiobuttons",
     labelStyle={'display': 'inline-block', 'margin-right': '5px'},
     style={"margin-left": "10px"},
@@ -61,8 +63,15 @@ layout = dbc.Container([
 ],fluid=True)
 
 @dash.callback(Output("graph", "figure"), Input("basic-data", "data"),Input("zeitraum","value"))
+
 def update_graph(jsonified_cleaned_data, zeitraum):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
+    df["Date"] = pd.to_datetime(df.Date).dt.tz_localize(None)
+    now = datetime.datetime.now(pytz.timezone('America/New_York'))
+    if zeitraum != "max":
+        zeitpunkt = now - datetime.timedelta(days=zeitraum)
+        zeitpunktformat = np.datetime64(zeitpunkt)
+        df = df.loc[df["Date"] >= zeitpunktformat]
     figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie", template= "plotly_white")
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Kurs (USD)")
