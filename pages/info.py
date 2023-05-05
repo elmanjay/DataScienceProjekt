@@ -85,14 +85,19 @@ def update_data(symbol):
     ]
     return output
 
-@dash.callback(Output("datumszeile-akt-markt", "children"), Input("aktien-dropdown", "value"), Input("basic-data", "data"))
+@dash.callback(Output("datumszeile-akt-markt", "children"),  Input("basic-data", "data"))
 
-def update_datum(symbol,jsonified_cleaned_data):
-    stock_data = yf.Ticker(symbol)
-    data = stock_data.info
-    open_price = data['regularMarketOpen']
+def update_datum(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
-    change_pct = (open_price - df["Close"].iloc[0]) / df["Close"].iloc[0] * 100
+    change_pct = (df["Open"].iloc[len(df)-1] - df["Open"].iloc[len(df)-2]) / df["Open"].iloc[len(df)-2] * 100
     change_pct = round(change_pct,2)
 
-    return html.H5(("{}, {} : {}".format(now.strftime("%A"), now.date(),change_pct )),style={"margin-left": "10px"}, className= "font-weight-bold")
+    if change_pct >0 :
+        vorzeichen = "+"
+        arrow= "▲"
+    else: 
+        vorzeichen = ""
+        arrow= "▼"
+    
+
+    return html.H5(("{}{}{}%:  {}, {}".format(arrow, vorzeichen,change_pct, now.strftime("%A"), now.date())),style={"margin-left": "10px"}, className= "font-weight-bold")
