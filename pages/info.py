@@ -58,6 +58,7 @@ layout = dbc.Container([
         html.H2("Historische Daten:", className= "card-header"),
         html.Hr(style={"margin-top": "0px"}),
         html.H5(id="datumszeile-hist-markt"),
+        html.Hr(style={"margin-top": "0px"}),
         html.Div(id="output-div-historischedaten",style={"margin-left": "10px"})
 
     ], className= "card border-primary mb-3")], width=3)
@@ -66,10 +67,9 @@ layout = dbc.Container([
     dcc.Store(id= "time-filtered-data")
 ],fluid=True)
 
+@dash.callback(Output("time-filtered-data", "data"), Input("basic-data", "data"),Input("zeitraum","value"))
 
-@dash.callback(Output("graph", "figure"), Input("basic-data", "data"),Input("zeitraum","value"))
-
-def update_graph(jsonified_cleaned_data, zeitraum):
+def update_data(jsonified_cleaned_data, zeitraum):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
     df["Date"] = pd.to_datetime(df.Date).dt.tz_localize(None)
     now = datetime.datetime.now(pytz.timezone('America/New_York'))
@@ -77,6 +77,12 @@ def update_graph(jsonified_cleaned_data, zeitraum):
         zeitpunkt = now - datetime.timedelta(days=zeitraum)
         zeitpunktformat = np.datetime64(zeitpunkt)
         df = df.loc[df["Date"] >= zeitpunktformat]
+    return df.to_json(date_format="iso", orient="split")
+
+@dash.callback(Output("graph", "figure"), Input("time-filtered-data", "data"))
+
+def update_graph(jsonified_cleaned_data):
+    df = pd.read_json(jsonified_cleaned_data, orient='split')
     figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie", template= "plotly_white")
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Kurs (USD)")
@@ -94,29 +100,24 @@ def update_data(symbol):
     output = [
         html.P("Open: {}$".format(open_price), className= "font-weight-bold"),
         html.P("Previous Close: {}$".format(close_price), className= "font-weight-bold"),
+        html.P("High: {}$".format(high_price), className= "font-weight-bold"),
         html.P("Low: {}$".format(low_price), className= "font-weight-bold"),
-        html.P("High: {}$".format(high_price), className= "font-weight-bold")
     ]
     return output
 
-@dash.callback(Output("output-div-historischedaten", "children"),Input("basic-data", "data"),Input("zeitraum","value"))
+@dash.callback(Output("output-div-historischedaten", "children"),Input("time-filtered-data", "data"))
 
-def update_data(jsonified_cleaned_data, zeitraum):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
-    df["Date"] = pd.to_datetime(df.Date).dt.tz_localize(None)
-    now = datetime.datetime.now(pytz.timezone('America/New_York'))
-    if zeitraum != "max":
-        zeitpunkt = now - datetime.timedelta(days=zeitraum)
-        zeitpunktformat = np.datetime64(zeitpunkt)
-        df = df.loc[df["Date"] >= zeitpunktformat]    
+def update_data(jsonified_cleaned_data):
+    df = pd.read_json(jsonified_cleaned_data, orient='split')   
     all_time_high = round(df["Open"].max(), 2)
     all_time_low = round(df["Open"].min(), 2)
     all_time_mean = round(df["Open"].mean(), 2)
+    all_time_std = round(df["Open"].std(), 2)
     output = [
-        html.P("All time high: {}$".format(all_time_high), className= "font-weight-bold"),
-        html.P("All time low: {}$".format(all_time_low), className= "font-weight-bold"),
+        html.P("High: {}$".format(all_time_high), className= "font-weight-bold"),
+        html.P("Low: {}$".format(all_time_low), className= "font-weight-bold"),
         html.P("Average: {}$".format(all_time_mean), className= "font-weight-bold"),
-        #html.P("High: {}$".format(high_price), className= "font-weight-bold")
+        html.P("Standard Deviation: {}".format(all_time_std), className="font-weight-bold")
     ]
     return output
 
@@ -137,7 +138,7 @@ def update_datum(jsonified_cleaned_data):
 
     return html.H5(("{}{}{}%:  {}, {}".format(arrow, vorzeichen,change_pct, now.strftime("%A"), now.date())),style={"margin-left": "10px"}, className= "font-weight-bold")
 
-@dash.callback(Output("datumszeile-hist-markt", "children"),  Input("basic-data", "data"),Input("zeitraum","value"))
+@dash.callback(Output("datumszeile-hist-markt", "children"),  Input("time-filtered-data", "data"),Input("zeitraum","value"))
 
 def update_datum(jsonified_cleaned_data,zeitraum):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
@@ -146,20 +147,13 @@ def update_datum(jsonified_cleaned_data,zeitraum):
 
     if zeitraum == "max":
         ausgabe_zeitpunkt = "Seit Start:"
-    
     elif zeitraum == 90:
         ausgabe_zeitpunkt = "3 Monate:"
-    
     elif zeitraum == 180:
         ausgabe_zeitpunkt = "6 Monate:"
-
-
     if change_pct >0 :
-        vorzeichen = "+"
-        
+        vorzeichen = "+"    
     else: 
         vorzeichen = ""
-
-    
 
     return html.H5(("{} {}{}%".format(ausgabe_zeitpunkt, vorzeichen,change_pct, )),style={"margin-left": "10px"}, className= "font-weight-bold")
