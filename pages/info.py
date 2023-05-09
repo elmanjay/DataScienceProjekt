@@ -7,12 +7,14 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from backend import decompose
+import datetime
+import locale
+import pytz
+import numpy as np
 
+now = datetime.datetime.now()
+locale.setlocale(locale.LC_TIME, 'de_DE')
 
-
-
-assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
-aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
 
 dash.register_page(__name__, path='/')
 
@@ -25,13 +27,14 @@ layout = dbc.Container([
              dbc.Col([
     dbc.RadioItems(id="zeitraum", 
     options=[
-        {'label': "Max", 'value': "max"},
-        {'label': "Letzte 3 Monate", 'value': 3},
-        {'label': "Letzte 6 Monate", 'value': 6}
+        {'label': "3 Monate", 'value': 90},
+        {'label': "6 Monate", 'value': 180},
+        {'label': "Max", 'value': "max"}
     ],
-    value="max",
+    value=90,
     className="radiobuttons",
-    labelStyle={'display': 'inline-block', 'margin-right': '10px'},
+    labelStyle={'display': 'inline-block', 'margin-right': '5px'},
+    style={"margin-left": "10px"},
     inline= True),
     dcc.Graph(id="graph")],
             width= 6),
