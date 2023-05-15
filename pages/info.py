@@ -155,6 +155,6 @@ def update_datum(jsonified_cleaned_data,zeitraum):
         vorzeichen = "+"    
     else: 
         vorzeichen = ""
-    print("test")
+
 
     return html.H5(("{} {}{}%".format(ausgabe_zeitpunkt, vorzeichen,change_pct, )),style={"margin-left": "10px"}, className= "font-weight-bold")
