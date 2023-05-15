@@ -6,7 +6,6 @@ from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from backend import decompose
 
 
 
