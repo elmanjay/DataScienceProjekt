@@ -127,6 +127,8 @@ def update_datum(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
     change_pct = (df["Open"].iloc[len(df)-1] - df["Open"].iloc[len(df)-2]) / df["Open"].iloc[len(df)-2] * 100
     change_pct = round(change_pct,2)
+    print(df["Open"].iloc[len(df)-1] )
+    print(df["Open"].iloc[len(df)-2])
 
     if change_pct >0 :
         vorzeichen = "+"
