@@ -80,7 +80,8 @@ layout = dbc.Container(
                                                 html.Div(id="output-div-historischedaten",
                                                          style={"margin-left": "10px"}),
                                             ],
-                                            className="card border-primary mb-3"
+                                            className="card border-primary mb-3",
+                                            style={"height": "95%"}
                                         ),
                                     width=6),
                                 ],
