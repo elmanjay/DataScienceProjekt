@@ -63,6 +63,18 @@ layout = dbc.Container([
 
     ], className= "card border-primary mb-3")], width=3)
 ]),
+dbc.Row([
+             dbc.Col([
+        html.Div( 
+    children= [
+        html.H2("Aktuelle Marktdaten:", className= "card-header"),
+        html.Hr(style={"margin-top": "0px"}),
+        html.H5("test"),
+        html.Hr(style={"margin-top": "0px"}),
+        html.Div(id="prognose",style={"margin-left": "10px"}),
+    ], className= "card text-white bg-primary mb-3")], width=6)
+             ]),
+
     dcc.Store(id="basic-data"),
     dcc.Store(id= "time-filtered-data")
 ],fluid=True)

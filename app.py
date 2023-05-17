@@ -26,7 +26,7 @@ app.layout = dbc.Container([
             dbc.NavItem(dbc.NavLink("Info", href="/")),
             dbc.NavItem(dbc.NavLink("Regression", href="/lstm")),
             dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="/zeitreihe")),
-            dbc.NavItem(dbc.NavLink("LSTM", href="#")),
+            dbc.NavItem(dbc.NavLink("LSTM", href="/lstm")),
             dbc.Col(
                 html.P(""),
                 width=2  # Hier setzen wir die Breite der Beschriftungsspalte auf 2
