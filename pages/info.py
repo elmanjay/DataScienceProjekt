@@ -22,59 +22,95 @@ dash.register_page(__name__, path='/')
 
 
 
-layout = dbc.Container([
-    dbc.Row([
-             dbc.Col([
-                 html.Div([
-    html.H2("Verlauf der Aktie:", className= "card-header"),
-    html.Label("Bitte wählen Sie den gewünschten Zeitraum:", style={"margin-left": "10px"}, className= "font-weight-bold"),
-    dbc.RadioItems(id="zeitraum", 
-    options=[
-        {'label': "3 Monate", 'value': 90},
-        {'label': "6 Monate", 'value': 180},
-        {'label': "Max", 'value': "max"}
-    ],
-    value=90,
-    className="radiobuttons",
-    labelStyle={'display': 'inline-block', 'margin-right': '5px'},
-    style={"margin-left": "10px"},
-    inline= True),
-    html.Hr(style={"margin-top": "0px"}),
-    dcc.Graph(id="graph")], className= "card border-primary mb-3")],
-            width=6),
+layout = dbc.Container(
+    [
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div(
+                        children=[
+                            html.H2("Verlauf der Aktie:", className="card-header"),
+                            html.Label("Bitte wählen Sie den gewünschten Zeitraum:",
+                                       style={"margin-left": "10px"}, className="font-weight-bold"),
+                            dbc.RadioItems(
+                                id="zeitraum",
+                                options=[
+                                    {'label': "3 Monate", 'value': 90},
+                                    {'label': "6 Monate", 'value': 180},
+                                    {'label': "Max", 'value': "max"}
+                                ],
+                                value=90,
+                                className="radiobuttons",
+                                labelStyle={'display': 'inline-block', 'margin-right': '5px'},
+                                style={"margin-left": "10px"},
+                                inline=True
+                            ),
+                            html.Hr(style={"margin-top": "0px"}),
+                            dcc.Graph(id="graph")
+                        ],
+                        className="card border-primary mb-3"
+                    ),
+                    width=6
+                ),
+                dbc.Col(
+                    dbc.Container(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        html.Div(
+                                            children=[
+                                                html.H2("Aktuelle Marktdaten:", className="card-header"),
+                                                html.Hr(style={"margin-top": "0px"}),
+                                                html.H5(id="datumszeile-akt-markt"),
+                                                html.Hr(style={"margin-top": "0px"}),
+                                                html.Div(id="output-div-aktuellemarktdaten",
+                                                         style={"margin-left": "10px"}),
+                                            ],
+                                            className="card text-white bg-primary mb-3 "
+                                        ),
+                                    width=6),
+                                    dbc.Col(
+                                        html.Div(
+                                            children=[
+                                                html.H2("Historische Daten:", className="card-header"),
+                                                html.Hr(style={"margin-top": "0px"}),
+                                                html.H5(id="datumszeile-hist-markt"),
+                                                html.Hr(style={"margin-top": "0px"}),
+                                                html.Div(id="output-div-historischedaten",
+                                                         style={"margin-left": "10px"}),
+                                            ],
+                                            className="card border-primary mb-3"
+                                        ),
+                                    width=6),
+                                ],
+                                className="mb-0 ",
+                                align="stretch"
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        html.Div(
+                                            children=[
+                                                html.H2("Prognose:", className="card-header"),
+                                                html.Hr(style={"margin-top": "0px"}),
+                                                html.P("Regression:",className= "font-weight-bold"),
+                                                html.P("Zeitreihe:",className= "font-weight-bold"),
+                                                html.P("LSTM:",className= "font-weight-bold")
 
-    dbc.Col([
-        html.Div( 
-    children= [
-        html.H2("Aktuelle Marktdaten:", className= "card-header"),
-        html.Hr(style={"margin-top": "0px"}),
-        html.H5(id="datumszeile-akt-markt"),
-        html.Hr(style={"margin-top": "0px"}),
-        html.Div(id="output-div-aktuellemarktdaten",style={"margin-left": "10px"}),
-    ], className= "card text-white bg-primary mb-3")], width=3),
-    dbc.Col([
-        html.Div( 
-    children= [
-        html.H2("Historische Daten:", className= "card-header"),
-        html.Hr(style={"margin-top": "0px"}),
-        html.H5(id="datumszeile-hist-markt"),
-        html.Hr(style={"margin-top": "0px"}),
-        html.Div(id="output-div-historischedaten",style={"margin-left": "10px"})
-
-    ], className= "card border-primary mb-3")], width=3)
-]),
-dbc.Row([
-             dbc.Col([
-        html.Div( 
-    children= [
-        html.H2("Aktuelle Marktdaten:", className= "card-header"),
-        html.Hr(style={"margin-top": "0px"}),
-        html.H5("test"),
-        html.Hr(style={"margin-top": "0px"}),
-        html.Div(id="prognose",style={"margin-left": "10px"}),
-    ], className= "card text-white bg-primary mb-3")], width=6)
-             ]),
-
+                                                #html.Div(id="prognose", style={"margin-left": "10px"}),
+                                            ],
+                                            className="card text-white bg-primary mb-3"
+                                        ),
+                                    ),
+                                ],
+                            className="my-0 " )
+                        ]
+                    ),
+                    width=6
+                )
+            ]
+        ),
     dcc.Store(id="basic-data"),
     dcc.Store(id= "time-filtered-data")
 ],fluid=True)
