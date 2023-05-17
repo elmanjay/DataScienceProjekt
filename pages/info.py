@@ -170,11 +170,15 @@ def update_data(jsonified_cleaned_data):
     ]
     return output
 
-@dash.callback(Output("datumszeile-akt-markt", "children"),  Input("basic-data", "data"))
+@dash.callback(Output("datumszeile-akt-markt", "children"),  Input("basic-data", "data"), Input("aktien-dropdown", "value") )
 
-def update_datum(jsonified_cleaned_data):
+def update_datum(jsonified_cleaned_data,symbol):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
-    change_pct = (df["Open"].iloc[len(df)-1] - df["Open"].iloc[len(df)-2]) / df["Open"].iloc[len(df)-2] * 100
+    stock_data = yf.Ticker(symbol)
+    data = stock_data.info
+    open_price = data['regularMarketOpen']
+    close_price = data['regularMarketPreviousClose']
+    change_pct = (data['regularMarketOpen'] - data['regularMarketPreviousClose']) / data['regularMarketPreviousClose'] * 100
     change_pct = round(change_pct,2)
    
 
