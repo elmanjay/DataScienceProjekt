@@ -81,7 +81,7 @@ layout = dbc.Container(
                                                          style={"margin-left": "10px"}),
                                             ],
                                             className="card border-primary mb-3",
-                                            style={"height": "95%"}
+                                            style={"height": "100%"}
                                         ),
                                     width=6),
                                 ],
@@ -101,7 +101,8 @@ layout = dbc.Container(
 
                                                 #html.Div(id="prognose", style={"margin-left": "10px"}),
                                             ],
-                                            className="card text-white bg-primary mb-3"
+                                            className="card text-white bg-primary mb-3",
+                                            style={"height": "110%"}
                                         ),
                                     ),
                                 ],
@@ -177,7 +178,6 @@ def update_datum(symbol):
     data = stock_data.info
     change_pct = (data['regularMarketOpen'] - data['regularMarketPreviousClose']) / data['regularMarketPreviousClose'] * 100
     change_pct = round(change_pct,2)
-    print(change_pct)
    
 
     if change_pct >0 :
