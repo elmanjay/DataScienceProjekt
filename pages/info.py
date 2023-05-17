@@ -170,13 +170,14 @@ def update_data(jsonified_cleaned_data):
     ]
     return output
 
-@dash.callback(Output("datumszeile-akt-markt", "children"),  Input("basic-data", "data"), Input("aktien-dropdown", "value") )
+@dash.callback(Output("datumszeile-akt-markt", "children"), Input("aktien-dropdown", "value") )
 
 def update_datum(symbol):
     stock_data = yf.Ticker(symbol)
     data = stock_data.info
     change_pct = (data['regularMarketOpen'] - data['regularMarketPreviousClose']) / data['regularMarketPreviousClose'] * 100
     change_pct = round(change_pct,2)
+    print(change_pct)
    
 
     if change_pct >0 :
