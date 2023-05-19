@@ -102,7 +102,7 @@ layout = dbc.Container(
                                                 #html.Div(id="prognose", style={"margin-left": "10px"}),
                                             ],
                                             className="card text-white bg-primary mb-3",
-                                            style={"height": "100%"}
+                                            style={"height": "106%"}
                                         ),
                                     ),
                                 ],
