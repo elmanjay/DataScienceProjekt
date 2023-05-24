@@ -13,7 +13,10 @@ def make_plot(df):
     df["Date"] = pd.Series(df["Date"], dtype="string")
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
     df = df.loc[:, ["Date", "Close"]]
-    train, test = train_test_split(df, test_size=0.20)
+    #train, test = train_test_split(df, test_size=0.20)
+    train_size = int(len(df) * 0.8)  # 80% der Daten für das Training
+    train = df[:train_size]
+    test = df[train_size:]
     X_train = np.array(train.index).reshape(-1, 1)
     y_train = train['Close']
     model = LinearRegression()
@@ -21,4 +24,6 @@ def make_plot(df):
     X_all = np.array(df.index).reshape(-1, 1)
     predictions = model.predict(X_all)
     df["Predictions"] = predictions
+    df["Train"] = np.where(df.index.isin(train.index), df["Close"], np.nan)
+    df["Test"] = np.where(df.index.isin(test.index), df["Close"], np.nan)
     return df
