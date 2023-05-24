@@ -133,7 +133,7 @@ def update_data(jsonified_cleaned_data, zeitraum):
 
 def update_graph(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
-    figure= px.line(df, x="Date", y="Open", title="Verlauf der Aktie", template= "plotly_white")
+    figure= px.line(df, x="Date", y="Close", title="Verlauf der Aktie", template= "plotly_white")
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Kurs (USD)")
     return figure
