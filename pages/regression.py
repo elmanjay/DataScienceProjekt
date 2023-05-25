@@ -31,12 +31,12 @@ layout = dbc.Container([
                                             ],
                                             className="card text-white bg-primary mb-3 "
                                         ),
-                                    width=6),
+                                    width=6), 
             
             ]),
     dcc.Store(id="basic-data"),
     dcc.Store(id="pred-data")
-                ])
+                ],fluid= True)
 
 @dash.callback(Output("graph_regression", "figure"),Output("pred-data", "data"), Input("basic-data", "data"))
 
