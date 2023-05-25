@@ -6,7 +6,7 @@ from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from backend_regression import make_plot
+from backend_regression import make_pred
 import plotly.graph_objects as go
 
 
@@ -20,20 +20,50 @@ layout = dbc.Container([
              dbc.Col([
                  html.Div([
     html.H2("Lineare Regression:", className= "card-header"),
-    dcc.Graph(id="graph_regression")], className= "card border-primary mb-3")],
-            ),]),
-    dcc.Store(id="basic-data")
+    dcc.Graph(id="graph_regression")], className= "card border-primary mb-3")],width=6),
+            dbc.Col(
+                                        html.Div(
+                                            children=[
+                                                html.H2("Performance:", className="card-header"),
+                                                html.Hr(style={"margin-top": "0px"}),
+                                                html.Div(id="output-div-performance",
+                                                         style={"margin-left": "10px"}),
+                                            ],
+                                            className="card text-white bg-primary mb-3 "
+                                        ),
+                                    width=6),
+            
+            ]),
+    dcc.Store(id="basic-data"),
+    dcc.Store(id="pred-data")
                 ])
 
-@dash.callback(Output("graph_regression", "figure"), Input("basic-data", "data"))
+@dash.callback(Output("graph_regression", "figure"),Output("pred-data", "data"), Input("basic-data", "data"))
 
 def update_graph(jsonified_cleaned_data):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
-    regression = make_plot(df, 2019)
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+    regression = make_pred(df, 2019)
     figure= px.scatter(template= "plotly_white")
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Predictions"], mode="lines", name="Vorhersage"))
     figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (USD)")
     figure.data[0].name = "Trainingsdaten"
-    return figure
+    preddata = regression.to_json(date_format="iso", orient="split")
+    return figure , preddata 
+
+@dash.callback(Output("output-div-performance", "children"), Input("pred-data", "data"))
+
+def update_div_performace(jsonified_cleaned_data):
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+    r2= round(df["R2 Score"].iloc[0],2)
+    mse= round(df["MSE"].iloc[0],2)
+    mae = round(df["MAE"].iloc[0],2)
+    rmse= round(df["RMSE"].iloc[0],2)
+    output = [
+        html.P("R2 Score: {}".format(r2), className= "font-weight-bold"),
+        html.P("Mean Squared Error: {}".format(mse), className= "font-weight-bold"),
+        html.P("Mean Absolute Error: {}".format(mae), className= "font-weight-bold"),
+        html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold"),
+    ]
+    return output
