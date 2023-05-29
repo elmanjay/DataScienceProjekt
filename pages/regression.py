@@ -17,36 +17,44 @@ dash.register_page(__name__)
 
 layout = dbc.Container([
     dbc.Row([
-             dbc.Col([
-                 html.Div([
-    html.H2("Lineare Regression:", className= "card-header"),
-    dcc.Graph(id="graph_regression")], className= "card border-primary mb-3")],width=6),
-            dbc.Col(
-                                        html.Div(
-                                            children=[
-                                                html.H2("Performance:", className="card-header"),
-                                                html.Hr(style={"margin-top": "0px"}),
-                                                html.Div(id="output-div-performance",
-                                                         style={"margin-left": "10px"}),
-                                            ],
-                                            className="card text-white bg-primary mb-3 "
-                                        ),
-                                    width=6), 
-            
-            ]),
+        dbc.Col([
+            html.Div([
+                html.H2("Lineare Regression:", className="card-header"),
+                dcc.Graph(id="graph_regression")
+            ], className="card border-primary mb-3")
+        ], width=6),
+        dbc.Col([
+            dbc.Container([
+                dbc.Row([
+                    html.Div([
+                        html.H2("Performance:", className="card-header"),
+                        html.Hr(style={"margin-top": "0px"}),
+                        html.Div(id="output-div-performance", style={"margin-left": "10px"})
+                    ], className="card text-white bg-primary mb-3")
+                ]),
+                dbc.Row([
+                    html.Div([
+                        html.H2("Vorhersage:", className="card-header"),
+                        html.Hr(style={"margin-top": "0px"}),
+                        html.Div(id="futre-pred-table", style={"margin-left": "10px"})
+                    ], className="card text-white bg-primary mb-3")
+                ])
+            ])
+        ], width=6)
+    ]),
     dcc.Store(id="basic-data"),
     dcc.Store(id="regression-data"),
-    dcc.Store(id="futur-data")
-                ],fluid= True)
+    dcc.Store(id="future-data")
+], fluid=True)
 
-@dash.callback(Output("regression-data", "data"),Output("futur-data", "data"), Input("basic-data", "data"))
+@dash.callback(Output("regression-data", "data"),Output("future-data", "data"), Input("basic-data", "data"))
 
 def generate_data(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
     regression, futurregression = make_pred(df, 2019)
     regressiondata = regression.to_json(date_format="iso", orient="split")
-    futurdata = futurregression.to_json(date_format="iso", orient="split")
-    return regressiondata , futurdata
+    futuredata = futurregression.to_json(date_format="iso", orient="split")
+    return regressiondata , futuredata
 
 
 @dash.callback(Output("graph_regression", "figure"), Input("regression-data", "data"))
@@ -76,3 +84,4 @@ def update_div_performace(jsonified_cleaned_data):
         html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold"),
     ]
     return output
+
