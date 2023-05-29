@@ -35,24 +35,33 @@ layout = dbc.Container([
             
             ]),
     dcc.Store(id="basic-data"),
-    dcc.Store(id="pred-data")
+    dcc.Store(id="regression-data"),
+    dcc.Store(id="futur-data")
                 ],fluid= True)
 
-@dash.callback(Output("graph_regression", "figure"),Output("pred-data", "data"), Input("basic-data", "data"))
+@dash.callback(Output("regression-data", "data"),Output("futur-data", "data"), Input("basic-data", "data"))
+
+def generate_data(jsonified_cleaned_data):
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+    regression, futurregression = make_pred(df, 2019)
+    regressiondata = regression.to_json(date_format="iso", orient="split")
+    futurdata = futurregression.to_json(date_format="iso", orient="split")
+    return regressiondata , futurdata
+
+
+@dash.callback(Output("graph_regression", "figure"), Input("regression-data", "data"))
 
 def update_graph(jsonified_cleaned_data):
-    df = pd.read_json(jsonified_cleaned_data, orient="split")
-    regression = make_pred(df, 2019)
+    regression = pd.read_json(jsonified_cleaned_data, orient="split")
     figure= px.scatter(template= "plotly_white")
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Predictions"], mode="lines", name="Vorhersage"))
     figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (USD)")
     figure.data[0].name = "Trainingsdaten"
-    preddata = regression.to_json(date_format="iso", orient="split")
-    return figure , preddata 
+    return figure 
 
-@dash.callback(Output("output-div-performance", "children"), Input("pred-data", "data"))
+@dash.callback(Output("output-div-performance", "children"), Input("regression-data", "data"))
 
 def update_div_performace(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
