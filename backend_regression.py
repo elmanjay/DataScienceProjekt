@@ -47,13 +47,12 @@ def make_pred(df, startjahr):
     df["RMSE"] = rmse
     last_date = pd.to_datetime(df["Date"].iloc[-1])
     future_dates = pd.date_range(start=last_date + pd.DateOffset(days=1), periods=14, freq='D')
-    next_14_values = np.arange(X_test.max()+1, X_test.max() + 15).reshape(-1, 1)
+    next_14_values = np.arange(X_test.max()+ 1, X_test.max() + 15).reshape(-1, 1)
     future_predictions= model.predict(next_14_values)
     today = datetime.date.today()
     future_dates = [today + datetime.timedelta(days=i) for i in range(1, 15)]
     future_df = pd.DataFrame({
     "Date": future_dates,
-    "Predicions": future_predictions
+    "Predictions": future_predictions
             })
-    print(future_df)
     return df, future_df

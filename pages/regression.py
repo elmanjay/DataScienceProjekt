@@ -36,7 +36,7 @@ layout = dbc.Container([
                     html.Div([
                         html.H2("Vorhersage:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
-                        html.Div(id="futre-pred-table", style={"margin-left": "10px"})
+                        html.Div(id="future-pred-table", style={"margin-left": "10px"})
                     ], className="card text-white bg-primary mb-3")
                 ])
             ])
@@ -84,4 +84,26 @@ def update_div_performace(jsonified_cleaned_data):
         html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold"),
     ]
     return output
+
+@dash.callback(Output("future-pred-table", "children"), Input("future-data", "data"), Input("basic-data", "data"))
+
+def update_div_performace(jsonified_cleaned_data, jsonified_cleaned_data_basic):
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+    df["Date"] = pd.Series(df["Date"], dtype="string")
+    df_basic= pd.read_json(jsonified_cleaned_data_basic, orient="split")
+    today_value = df_basic["Close"].iloc[len(df_basic)-1]
+    entwicklung_tomorrow = round((df["Predictions"].iloc[0] - today_value) / today_value *100,2)
+    entwicklung_week = round((df["Predictions"].iloc[6] - today_value) / today_value *100,2)
+    entwicklung_twoweek = round((df["Predictions"].iloc[13] - today_value) / today_value *100, 2)
+    table_header = [
+    html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
+
+    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predictions"].iloc[0], 2))+"$"), html.Td("+"+str(entwicklung_tomorrow)+"%"), html.Td(df["Date"].iloc[0])])
+    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predictions"].iloc[6], 2))+"$"), html.Td("+"+str(entwicklung_week)+"%"),html.Td(df["Date"].iloc[6])])
+    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predictions"].iloc[13], 2))+"$"), html.Td("+"+str(entwicklung_twoweek)+"%"),html.Td(df["Date"].iloc[13])])
+
+    table_body = [html.Tbody([row1, row2, row3])]
+
+    table = dbc.Table(table_header + table_body, bordered=True, className="table-dark table table-hover")
+    return table 
 
