@@ -32,11 +32,12 @@ def make_pred(df, startjahr):
     X_all = np.array(df.index).reshape(-1, 1)
     predictions = model.predict(X_all)
     predictionstest = model.predict(X_test)
+    predictionstrain = model.predict(X_train)
     df["Predictions"] = predictions
     df["Predictions"] = predictions
     df["Train"] = np.where(df.index.isin(train.index), df["Close"], np.nan)
     df["Test"] = np.where(df.index.isin(test.index), df["Close"], np.nan)
-    r2_score_result = r2_score(y_test, predictionstest)
+    r2_score_result = r2_score(y_train, predictionstrain)
     df["R2 Score"] = r2_score_result
     mse = mean_squared_error(y_test, predictionstest)
     df["MSE"] = mse
