@@ -68,7 +68,7 @@ layout = dbc.Container([
 
 def generate_data(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
-    regression, futurregression = make_pred(df, 2019)
+    regression, futurregression = make_pred(df, 2022)
     regressiondata = regression.to_json(date_format="iso", orient="split")
     futuredata = futurregression.to_json(date_format="iso", orient="split")
     return regressiondata , futuredata
