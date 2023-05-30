@@ -20,8 +20,25 @@ layout = dbc.Container([
         dbc.Col([
             html.Div([
                 html.H2("Lineare Regression:", className="card-header"),
+                html.Hr(),
+                html.Label("Bitte wählen Sie den gewünschten Zeitraum:",
+                    style={"margin-left": "10px"}, className="font-weight-bold"),
+                dbc.RadioItems(
+                                id="zeitraum",
+                                options=[
+                                    {'label': "3 Monate", 'value': 90},
+                                    {'label': "6 Monate", 'value': 180},
+                                    {'label': "Max", 'value': "max"}
+                                ],
+                                value=90,
+                                className="radiobuttons",
+                                labelStyle={'display': 'inline-block', 'margin-right': '5px'},
+                                style={"margin-left": "10px"},
+                                inline=True
+                            ),
+                html.Hr(),
                 dcc.Graph(id="graph_regression")
-            ], className="card border-primary mb-3")
+            ], className="card text-white bg-primary mb-3")
         ], width=6),
         dbc.Col([
             dbc.Container([
@@ -37,7 +54,7 @@ layout = dbc.Container([
                         html.H2("Vorhersage:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
                         html.Div(id="future-pred-table", style={"margin-left": "10px"})
-                    ], className="card text-white bg-primary mb-3")
+                    ], className="card border-primary mb-3")
                 ])
             ])
         ], width=6)
@@ -61,7 +78,7 @@ def generate_data(jsonified_cleaned_data):
 
 def update_graph(jsonified_cleaned_data):
     regression = pd.read_json(jsonified_cleaned_data, orient="split")
-    figure= px.scatter(template= "plotly_white")
+    figure= px.scatter(template= "plotly_dark")
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Predictions"], mode="lines", name="Vorhersage"))
@@ -95,15 +112,21 @@ def update_div_performace(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     entwicklung_tomorrow = round((df["Predictions"].iloc[0] - today_value) / today_value *100,2)
     entwicklung_week = round((df["Predictions"].iloc[6] - today_value) / today_value *100,2)
     entwicklung_twoweek = round((df["Predictions"].iloc[13] - today_value) / today_value *100, 2)
+    entwicklungen = []
+    for element in entwicklung_tomorrow, entwicklung_week, entwicklung_twoweek:
+        if int(element) > 0:
+            element = "+"+str(element) 
+        entwicklungen.append(element)
+
     table_header = [
     html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
 
-    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predictions"].iloc[0], 2))+"$"), html.Td("+"+str(entwicklung_tomorrow)+"%"), html.Td(df["Date"].iloc[0])])
-    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predictions"].iloc[6], 2))+"$"), html.Td("+"+str(entwicklung_week)+"%"),html.Td(df["Date"].iloc[6])])
-    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predictions"].iloc[13], 2))+"$"), html.Td("+"+str(entwicklung_twoweek)+"%"),html.Td(df["Date"].iloc[13])])
+    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predictions"].iloc[0], 2))+"$"), html.Td(str(entwicklungen[0])+"%"), html.Td(df["Date"].iloc[0])])
+    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predictions"].iloc[6], 2))+"$"), html.Td(str(entwicklungen[1])+"%"),html.Td(df["Date"].iloc[6])])
+    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predictions"].iloc[13], 2))+"$"), html.Td(str(entwicklungen[2])+"%"),html.Td(df["Date"].iloc[13])])
 
     table_body = [html.Tbody([row1, row2, row3])]
 
-    table = dbc.Table(table_header + table_body, bordered=True, className="table-dark table table-hover")
+    table = dbc.Table(table_header + table_body, bordered=True, className="table-secondary table-hover card-body")
     return table 
 
