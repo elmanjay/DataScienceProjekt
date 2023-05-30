@@ -51,7 +51,7 @@ layout = dbc.Container([
                 ]),
                 dbc.Row([
                     html.Div([
-                        html.H2("Vorhersage:", className="card-header"),
+                        html.H2("Prognose:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
                         html.Div(id="future-pred-table", style={"margin-left": "10px"})
                     ], className="card border-primary mb-3")
