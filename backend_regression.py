@@ -20,9 +20,10 @@ def make_pred(df, startjahr):
     df = df.loc[:, ["Date", "Close"]]
     start_year = int(startjahr)  # Das gewünschte Startjah
     df = df[df["Date"].str[:4].astype(int) >= start_year]
-    train_size = int(len(df) * 0.8)  # 80% der Daten für das Training
-    train = df[:train_size]
-    test = df[train_size:]
+    train, test = train_test_split(df, test_size=0.2, random_state=42)
+    #train_size = int(len(df) * 0.8)  # 80% der Daten für das Training
+    #train = df[:train_size]
+    #test = df[train_size:]
     X_train = np.array(train.index).reshape(-1, 1)
     y_train = train["Close"]
     X_test = np.array(test.index).reshape(-1, 1)
