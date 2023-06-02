@@ -68,7 +68,7 @@ layout = dbc.Container([
 
 def generate_data(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
-    regression, futurregression = make_pred(df, 2022)
+    regression, futurregression = make_pred(df, 2023)
     regressiondata = regression.to_json(date_format="iso", orient="split")
     futuredata = futurregression.to_json(date_format="iso", orient="split")
     return regressiondata , futuredata
@@ -130,3 +130,7 @@ def update_div_performace(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     table = dbc.Table(table_header + table_body, bordered=True, className="table-secondary table-hover card-body")
     return table 
 
+@dash.callback(Output("regression-mainpage", "data"), Input("future-data", "data"))
+
+def share_data(jsonified_cleaned_data):
+    return jsonified_cleaned_data

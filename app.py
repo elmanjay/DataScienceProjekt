@@ -39,7 +39,7 @@ app.layout = dbc.Container([
                 dcc.Dropdown(
                     id="aktien-dropdown",
                     options=[{"label": j, "value": aktie} for j, aktie in zip(aktien, assets)],
-                    placeholder="Bitte wählen Sie eine Aktie",
+                    value= assets[0],
                     style={"width": "300px","color": "black"}
                 ),
                 width=True   # Hier setzen wir die Breite der Dropdown-Spalte auf 6
@@ -52,7 +52,9 @@ app.layout = dbc.Container([
     html.Hr(),
     dash.page_container,
         # dcc.Store stores the intermediate value
-    dcc.Store(id="basic-data")
+    dcc.Store(id="basic-data"),
+    dcc.Store(id="regression-mainpage"),
+    html.P(id="dummy")
     
 ]),
 ],fluid=True)

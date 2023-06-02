@@ -11,6 +11,7 @@ import datetime
 import locale
 import pytz
 import numpy as np
+from backend_regression import make_pred
 
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
@@ -95,11 +96,7 @@ layout = dbc.Container(
                                             children=[
                                                 html.H2("Prognose:", className="card-header"),
                                                 html.Hr(style={"margin-top": "0px"}),
-                                                html.P("Regression:",className= "font-weight-bold"),
-                                                html.P("Zeitreihe:",className= "font-weight-bold"),
-                                                html.P("LSTM:",className= "font-weight-bold")
-
-                                                #html.Div(id="prognose", style={"margin-left": "10px"}),
+                                                html.Div(id="prognose-div", style={"margin-left": "10px"}),
                                             ],
                                             className="card text-white bg-primary mb-3",
                                             style={"height": "106%"}
@@ -207,6 +204,32 @@ def update_datum(jsonified_cleaned_data,zeitraum):
         vorzeichen = "+"    
     else: 
         vorzeichen = ""
-
-
     return html.H5(("{} {}{}%".format(ausgabe_zeitpunkt, vorzeichen,change_pct, )),style={"margin-left": "10px"}, className= "font-weight-bold")
+
+@dash.callback(Output("prognose-div", "children"),Input("aktien-dropdown", "value"), Input("basic-data", "data"))
+def update_reg_main(symbol, data):
+    stock_data = yf.Ticker(symbol)
+    data_demand = stock_data.info
+    close_price = data_demand ['regularMarketPreviousClose']
+    forecasts = []
+    percentage = []
+    vorzeichen_liste = []
+    df = pd.read_json(data, orient="split")
+    result_regression= make_pred(df, 2023)
+    forecasts.append(round(result_regression[1]["Predictions"].iloc[0],2))
+
+    for element in forecasts:
+        value = (element - close_price) / close_price *100
+        value= round(value,2)
+        if value >0 :
+            value = "+" + str(value)
+        percentage.append(value)
+    
+
+
+    output = [
+        html.P("Regression({}%): {}$".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
+        html.P("Arima: {}$".format(forecasts[0]), className= "font-weight-bold"),
+        html.P("LSTM: {}$".format(forecasts[0]), className= "font-weight-bold")
+    ]
+    return output
