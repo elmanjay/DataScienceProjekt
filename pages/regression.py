@@ -6,7 +6,7 @@ from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from backend_regression import make_pred
+from backend_regression import make_pred, make_pred_month
 import plotly.graph_objects as go
 
 
@@ -26,11 +26,12 @@ layout = dbc.Container([
                 dbc.RadioItems(
                                 id="zeitraum",
                                 options=[
-                                    {'label': "3 Monate", 'value': 90},
+                                    {'label': "1 Monat (empfohlen)", 'value': 30},
+                                    {'label': "3 Monate ", 'value': 90},
                                     {'label': "6 Monate", 'value': 180},
-                                    {'label': "Max", 'value': "max"}
+                                    {'label': "1 Jahr", 'value': 365}
                                 ],
-                                value=90,
+                                value=30,
                                 className="radiobuttons",
                                 labelStyle={'display': 'inline-block', 'margin-right': '5px'},
                                 style={"margin-left": "10px"},
@@ -64,11 +65,11 @@ layout = dbc.Container([
     dcc.Store(id="future-data")
 ], fluid=True)
 
-@dash.callback(Output("regression-data", "data"),Output("future-data", "data"), Input("basic-data", "data"))
+@dash.callback(Output("regression-data", "data"),Output("future-data", "data"), Input("basic-data", "data"), Input("zeitraum","value") )
 
-def generate_data(jsonified_cleaned_data):
+def generate_data(jsonified_cleaned_data,zeitraum):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
-    regression, futurregression = make_pred(df, 2023)
+    regression, futurregression = make_pred_month(df, zeitraum)
     regressiondata = regression.to_json(date_format="iso", orient="split")
     futuredata = futurregression.to_json(date_format="iso", orient="split")
     return regressiondata , futuredata
