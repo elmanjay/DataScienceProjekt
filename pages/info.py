@@ -11,7 +11,7 @@ import datetime
 import locale
 import pytz
 import numpy as np
-from backend_regression import make_pred
+from backend_regression import make_pred_month
 
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
@@ -215,7 +215,7 @@ def update_reg_main(symbol, data):
     percentage = []
     vorzeichen_liste = []
     df = pd.read_json(data, orient="split")
-    result_regression= make_pred(df, 2023)
+    result_regression= make_pred_month(df, 30)
     forecasts.append(round(result_regression[1]["Predictions"].iloc[0],2))
 
     for element in forecasts:
@@ -228,7 +228,7 @@ def update_reg_main(symbol, data):
 
 
     output = [
-        html.P("Regression({}%): {}$".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
+        html.P("Lineare Regression({}%): {}$".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
         html.P("Arima: {}$".format(forecasts[0]), className= "font-weight-bold"),
         html.P("LSTM: {}$".format(forecasts[0]), className= "font-weight-bold")
     ]

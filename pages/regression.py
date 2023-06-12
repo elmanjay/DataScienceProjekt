@@ -39,7 +39,7 @@ layout = dbc.Container([
                             ),
                 html.Hr(),
                 dcc.Graph(id="graph_regression")
-            ], className="card text-white bg-primary mb-3")
+            ], className="card text-white bg-primary mb-3", style={"height": "97.5%"})
         ], width=6),
         dbc.Col([
             dbc.Container([
@@ -79,7 +79,6 @@ def generate_data(jsonified_cleaned_data,zeitraum):
 
 def update_graph(jsonified_cleaned_data):
     regression = pd.read_json(jsonified_cleaned_data, orient="split")
-    print(regression)
     figure= px.scatter(template= "plotly_dark")
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
@@ -95,11 +94,13 @@ def update_div_performace(jsonified_cleaned_data):
     r2= round(df["R2 Score"].iloc[0],2)
     mse= round(df["MSE"].iloc[0],2)
     mae = round(df["MAE"].iloc[0],2)
+    smae = round(df["Scaled_mae"].iloc[0] * 100,2)
     rmse= round(df["RMSE"].iloc[0],2)
     output = [
         html.P("R2 Score: {}".format(r2), className= "font-weight-bold"),
         html.P("Mean Squared Error: {}".format(mse), className= "font-weight-bold"),
         html.P("Mean Absolute Error: {}".format(mae), className= "font-weight-bold"),
+        html.P("Scaled Mean Absolute Error: {}%".format(smae), className= "font-weight-bold"),
         html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold"),
     ]
     return output
