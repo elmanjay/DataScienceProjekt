@@ -79,6 +79,7 @@ def generate_data(jsonified_cleaned_data,zeitraum):
 
 def update_graph(jsonified_cleaned_data):
     regression = pd.read_json(jsonified_cleaned_data, orient="split")
+    print(regression)
     figure= px.scatter(template= "plotly_dark")
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
@@ -105,7 +106,7 @@ def update_div_performace(jsonified_cleaned_data):
 
 @dash.callback(Output("future-pred-table", "children"), Input("future-data", "data"), Input("basic-data", "data"))
 
-def update_div_performace(jsonified_cleaned_data, jsonified_cleaned_data_basic):
+def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
     df["Date"] = pd.Series(df["Date"], dtype="string")
     df_basic= pd.read_json(jsonified_cleaned_data_basic, orient="split")

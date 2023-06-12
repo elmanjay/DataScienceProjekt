@@ -89,6 +89,8 @@ def make_pred_month(df, daysgiven):
     df.loc[:, "MAE"] = mae
     rmse = np.sqrt(mse)
     df.loc[:, "RMSE"] = rmse
+    scaled_mae= mae / test["Close"].mean()
+    df.loc[:, "Scaled_mae"] = scaled_mae
     last_date = pd.to_datetime(df["Date"].iloc[-1])
     future_dates = pd.date_range(start=last_date + pd.DateOffset(days=1), periods=14, freq='D')
     next_14_values = np.arange(X_test.max() + 1, X_test.max() + 15).reshape(-1, 1)
