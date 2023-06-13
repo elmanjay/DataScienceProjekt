@@ -79,13 +79,31 @@ def generate_data(jsonified_cleaned_data,zeitraum):
 
 def update_graph(jsonified_cleaned_data):
     regression = pd.read_json(jsonified_cleaned_data, orient="split")
-    figure= px.scatter(template= "plotly_dark")
+    figure = px.scatter(template="plotly_dark")
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Predictions"], mode="lines", name="Vorhersage"))
-    figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (USD)")
+    figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (USD)", xaxis_type="category")
+    figure.update_xaxes(tickformat="%Y-%m-%d")  # X-Achsenbeschriftung im gewünschten Format festlegen
+    
+    # Anzahl der X-Achsenbeschriftungen festlegen
+    num_ticks = 5
+
+    # Werte und Beschriftungen für die X-Achsenbeschriftung auswählen
+    step = len(regression["Date"]) // num_ticks
+    tickvals = regression["Date"][::step]
+    ticktext = [date.strftime("%Y-%m-%d") for date in tickvals]
+
+    # Manuelle Anpassung der X-Achsenbeschriftungen
+    figure.update_xaxes(
+        tickmode="array",
+        tickvals=tickvals,
+        ticktext=ticktext
+    )
+
     figure.data[0].name = "Trainingsdaten"
-    return figure 
+    return figure
+
 
 @dash.callback(Output("output-div-performance", "children"), Input("regression-data", "data"))
 

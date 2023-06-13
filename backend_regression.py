@@ -101,6 +101,7 @@ def make_pred_month(df, daysgiven):
         "Date": future_dates,
         "Predictions": future_predictions
     })  # Erzeuge ein DataFrame für die zukünftigen Vorhersagen
+    print(df)
     return df, future_df  # Gib den aktuellen DataFrame und das zukünftige DataFrame zurück
 
 
