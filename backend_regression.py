@@ -60,6 +60,7 @@ def make_pred(df, startjahr):
 
 def make_pred_month(df, daysgiven):
     df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
+    df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
     now = datetime.datetime.now(pytz.timezone('America/New_York'))  # Aktuelles Datum und Uhrzeit in der Zeitzone New York
     zeitpunkt = now - datetime.timedelta(days=daysgiven)  # Berechne den Zeitpunkt basierend auf der angegebenen Anzahl von Tagen
@@ -101,7 +102,7 @@ def make_pred_month(df, daysgiven):
         "Date": future_dates,
         "Predictions": future_predictions
     })  # Erzeuge ein DataFrame für die zukünftigen Vorhersagen
-    print(df)
+    print(df.head())
     return df, future_df  # Gib den aktuellen DataFrame und das zukünftige DataFrame zurück
 
 
