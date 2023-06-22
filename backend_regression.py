@@ -94,7 +94,7 @@ def make_pred_month(df, daysgiven):
     df.loc[:, "Scaled_mae"] = scaled_mae  # Füge den skalierten MAE dem DataFrame hinzu
     last_date = pd.to_datetime(df["Date"].iloc[-1])  # Extrahiere das letzte Datum im DataFrame
     future_dates = pd.date_range(start=last_date + pd.DateOffset(days=1), periods=14, freq='D')  # Erzeuge zukünftige Datumsangaben
-    next_14_values = np.arange(X_test.max() + 1, X_test.max() + 15).reshape(-1, 1)  # Berechne die Indizes für die zukünftigen Vorhersagen
+    next_14_values = np.arange(df.index[-1] + 1, df.index[-1] + 15).reshape(-1, 1)  # Berechne die Indizes für die zukünftigen Vorhersagen
     future_predictions = model.predict(next_14_values)  # Mache zukünftige Vorhersagen
     today = datetime.date.today()  # Aktuelles Datum
     future_dates = [today + datetime.timedelta(days=i) for i in range(1, 15)]  # Erzeuge die Datumsangaben für die nächsten 14 Tage
@@ -102,7 +102,6 @@ def make_pred_month(df, daysgiven):
         "Date": future_dates,
         "Predictions": future_predictions
     })  # Erzeuge ein DataFrame für die zukünftigen Vorhersagen
-    print(df.head())
     return df, future_df  # Gib den aktuellen DataFrame und das zukünftige DataFrame zurück
 
 
