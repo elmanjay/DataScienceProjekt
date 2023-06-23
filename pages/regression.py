@@ -83,7 +83,7 @@ def update_graph(jsonified_cleaned_data):
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Train"], mode="markers", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Predictions"], mode="lines", name="Vorhersage"))
-    figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (USD)", xaxis_type="category")
+    figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (EUR)", xaxis_type="category")
     figure.update_xaxes(tickformat="%Y-%m-%d")  # X-Achsenbeschriftung im gewünschten Format festlegen
     
     # Anzahl der X-Achsenbeschriftungen festlegen
