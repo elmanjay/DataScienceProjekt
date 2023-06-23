@@ -9,8 +9,8 @@ import plotly.express as px
 
 
 
-assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
-aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
+assets = ["ALV.DE", "AMZ.DE", "DPW.DE", "MDO.DE", "NVD.DE","^MDAXI"]
+aktien = ["Allianz","Amazon","Deutsche Post","McDonald‘s", "NVIDIA","MDAX"]
 
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX],use_pages=True)
 

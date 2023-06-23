@@ -132,7 +132,7 @@ def update_graph(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient='split')
     figure= px.line(df, x="Date", y="Close", title="Verlauf der Aktie", template= "plotly_white")
     figure.update_xaxes(title_text="Datum")
-    figure.update_yaxes(title_text="Kurs (USD)")
+    figure.update_yaxes(title_text="Kurs (EUR)")
     return figure
 
 @dash.callback(Output("output-div-aktuellemarktdaten", "children"), Input("aktien-dropdown", "value"))
@@ -145,10 +145,10 @@ def update_data(symbol):
     low_price = data['regularMarketDayLow']
     high_price = data['regularMarketDayHigh']
     output = [
-        html.P("Open: {}$".format(open_price), className= "font-weight-bold"),
-        html.P("Previous Close: {}$".format(close_price), className= "font-weight-bold"),
-        html.P("High: {}$".format(high_price), className= "font-weight-bold"),
-        html.P("Low: {}$".format(low_price), className= "font-weight-bold"),
+        html.P("Open: {}€".format(open_price), className= "font-weight-bold"),
+        html.P("Previous Close: {}€".format(close_price), className= "font-weight-bold"),
+        html.P("High: {}€".format(high_price), className= "font-weight-bold"),
+        html.P("Low: {}€".format(low_price), className= "font-weight-bold"),
     ]
     return output
 
@@ -161,9 +161,9 @@ def update_data(jsonified_cleaned_data):
     all_time_mean = round(df["Open"].mean(), 2)
     all_time_std = round(df["Open"].std(), 2)
     output = [
-        html.P("High: {}$".format(all_time_high), className= "font-weight-bold"),
-        html.P("Low: {}$".format(all_time_low), className= "font-weight-bold"),
-        html.P("Average: {}$".format(all_time_mean), className= "font-weight-bold"),
+        html.P("High: {}€".format(all_time_high), className= "font-weight-bold"),
+        html.P("Low: {}€".format(all_time_low), className= "font-weight-bold"),
+        html.P("Average: {}€".format(all_time_mean), className= "font-weight-bold"),
         html.P("Standard Deviation: {}".format(all_time_std), className="font-weight-bold")
     ]
     return output
@@ -228,8 +228,8 @@ def update_reg_main(symbol, data):
 
 
     output = [
-        html.P("Lineare Regression({}%): {}$".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
-        html.P("Arima: {}$".format(forecasts[0]), className= "font-weight-bold"),
-        html.P("LSTM: {}$".format(forecasts[0]), className= "font-weight-bold")
+        html.P("Lineare Regression({}%): {}€".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
+        html.P("Arima: {}€".format(forecasts[0]), className= "font-weight-bold"),
+        html.P("LSTM: {}€".format(forecasts[0]), className= "font-weight-bold")
     ]
     return output

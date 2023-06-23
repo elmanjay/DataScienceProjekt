@@ -142,9 +142,9 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     table_header = [
     html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
 
-    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predictions"].iloc[0], 2))+"$"), html.Td(str(entwicklungen[0])+"%"), html.Td(df["Date"].iloc[0])])
-    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predictions"].iloc[6], 2))+"$"), html.Td(str(entwicklungen[1])+"%"),html.Td(df["Date"].iloc[6])])
-    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predictions"].iloc[13], 2))+"$"), html.Td(str(entwicklungen[2])+"%"),html.Td(df["Date"].iloc[13])])
+    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predictions"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[0])+"%"), html.Td(df["Date"].iloc[0])])
+    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predictions"].iloc[6], 2))+"€"), html.Td(str(entwicklungen[1])+"%"),html.Td(df["Date"].iloc[6])])
+    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predictions"].iloc[13], 2))+"€"), html.Td(str(entwicklungen[2])+"%"),html.Td(df["Date"].iloc[13])])
 
     table_body = [html.Tbody([row1, row2, row3])]
 
