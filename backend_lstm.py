@@ -124,6 +124,38 @@ def lstm_stock_prediction2(df, daysgiven, prediction_days=14):
     train_model(model, x_train, y_train, x_train, y_train, epochs=2)
     save_model(model, 'lstm_model', save_format='tf')
 
+def lstm_stock_prediction3(df, daysgiven, prediction_days=14):
+    df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
+    df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
+    df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
+    now = datetime.datetime.now(pytz.timezone('America/New_York'))  # Aktuelles Datum und Uhrzeit in der Zeitzone New York
+    zeitpunkt = now - datetime.timedelta(days=daysgiven)  # Berechne den Zeitpunkt basierend auf der angegebenen Anzahl von Tagen
+    zeitpunktformat = np.datetime64(zeitpunkt)  # Konvertiere den Zeitpunkt in das richtige Format
+    df = df.loc[df["Date"] >= zeitpunktformat]  # Filtere den DataFrame nach dem Zeitpunkt
+    df["Date"] = pd.Series(df["Date"], dtype="string")  # Konvertiere das Datum in einen String
+    df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})') 
+    df = df.set_index("Date")
+
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(df.values)
+
+    train_len = int(len(scaled_data) * 0.92)
+    train_data = scaled_data[:train_len, :]
+    test_data = scaled_data[train_len - 2:, :]
+
+    x_train, y_train = [], []
+    interval = 10
+
+    for i in range(interval, len(train_data)):
+        x_train.append(train_data[i - interval:i, 0])
+        y_train.append(train_data[i, 0])
+
+    x_train, y_train = np.array(x_train), np.array(y_train)
+    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+
+    model = load_model('lstm_model')
+    
+
     x_test = np.array([test_data[-interval:, 0]])
     predictions = []
 
@@ -157,7 +189,7 @@ def give_results(ticker_symbol, start_date, end_date, prediction_days=14):
     return train_data, test_data, predictions
 
 def give_results2(df, days, prediction_days=14):
-    predictions = lstm_stock_prediction2(df, days, prediction_days=14)
+    predictions = lstm_stock_prediction3(df, days, prediction_days=14)
     #metrics = calculate_metrics(predictions)
     train_data, test_data = give_train_test2(df, days)
     print(predictions)
@@ -209,11 +241,13 @@ def calculate_metrics(prediction_table):
     return metrics_table
 
 
-#msft = yf.Ticker("AMZN")
+#msft = yf.Ticker("ALV.DE")
 #df = msft.history(period="max")
 #df.reset_index(inplace= True)
 #print(df.tail())
-#a,b,c = give_results2(df, 356 , prediction_days=14)
+#lstm_stock_prediction2(df, 365, prediction_days=14)
+#hehe = lstm_stock_prediction3(df, 365, prediction_days=14)
+#print(hehe)
 #print(a)
 #print(b)
 #print(c)
