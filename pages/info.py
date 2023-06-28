@@ -213,12 +213,13 @@ def update_reg_main(symbol, data):
     close_price = data_demand ['regularMarketPreviousClose']
     forecasts = []
     percentage = []
-    vorzeichen_liste = []
     df = pd.read_json(data, orient="split")
     result_regression= make_pred_month(df, 30)
     result_lstm = lstm_stock_prediction3(df, 365, ticker=symbol, prediction_days=14)
+    value_lstm= round(result_lstm["Predicted Close"].iloc[0],2)
     forecasts.append(round(result_regression[1]["Predictions"].iloc[0],2))
-    forecasts.append(round(result_lstm[1]["Predicted Close"].iloc[0],2))
+    forecasts.append(value_lstm)
+    print(forecasts)
 
     for element in forecasts:
         value = (element - close_price) / close_price *100
@@ -231,7 +232,7 @@ def update_reg_main(symbol, data):
 
     output = [
         html.P("Lineare Regression({}%): {}€".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
-        html.P("LSTM:({}%): {}€".format(percentage[1],forecasts[1])),
+        html.P("LSTM:({}%): {}€".format(percentage[1],forecasts[1],2)),
         html.P("Arima: {}€".format(forecasts[0]), className= "font-weight-bold")
     ]
     return output

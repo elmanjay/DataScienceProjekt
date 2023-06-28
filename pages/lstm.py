@@ -133,6 +133,7 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df.reset_index(inplace=True,names="Date")
     df["Date"] = pd.Series(df["Date"], dtype="string") 
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
+    print(df_basic.iloc[len(df_basic)-1])
     today_value = df_basic["Close"].iloc[len(df_basic)-1]
     entwicklung_tomorrow = round((df["Predicted Close"].iloc[0] - today_value) / today_value *100,2)
     entwicklung_week = round((df["Predicted Close"].iloc[6] - today_value) / today_value *100,2)
