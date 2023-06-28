@@ -36,7 +36,7 @@ def create_model():
     model.compile(loss="mse", optimizer=Adam(learning_rate=0.001), metrics=["mean_absolute_error"])
     return model
 
-def train_model(model, X_train, y_train, X_val, y_val, epochs=100):
+def train_model(model, X_train, y_train, X_val, y_val, epochs=200):
     model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=epochs)
 
  #Achtung optimale epochen für ablauf müssen noch bestimmt werden   
@@ -63,7 +63,7 @@ def lstm_stock_prediction(ticker_symbol, start_date, end_date, prediction_days=1
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
     model = create_model()
-    train_model(model, x_train, y_train, x_train, y_train, epochs=2)
+    train_model(model, x_train, y_train, x_train, y_train, epochs=20)
 
     x_test = np.array([test_data[-interval:, 0]])
     predictions = []
@@ -121,7 +121,7 @@ def lstm_stock_prediction2(df, daysgiven, prediction_days=14):
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
     model = create_model()
-    train_model(model, x_train, y_train, x_train, y_train, epochs=2)
+    train_model(model, x_train, y_train, x_train, y_train, epochs=20)
     save_model(model, 'lstm_model', save_format='tf')
 
 def lstm_stock_prediction3(df, daysgiven, prediction_days=14):
@@ -192,7 +192,6 @@ def give_results2(df, days, prediction_days=14):
     predictions = lstm_stock_prediction3(df, days, prediction_days=14)
     #metrics = calculate_metrics(predictions)
     train_data, test_data = give_train_test2(df, days)
-    print(predictions)
     return train_data, test_data, predictions
 
 def give_train_test(ticker_symbol, start_date, end_date):
@@ -240,12 +239,10 @@ def calculate_metrics(prediction_table):
 
     return metrics_table
 
-
 #msft = yf.Ticker("ALV.DE")
 #df = msft.history(period="max")
 #df.reset_index(inplace= True)
-#print(df.tail())
-#lstm_stock_prediction2(df, 365, prediction_days=14)
+#lstm_stock_prediction2(df, 1095, prediction_days=14)
 #hehe = lstm_stock_prediction3(df, 365, prediction_days=14)
 #print(hehe)
 #print(a)

@@ -10,6 +10,9 @@ from backend_lstm import give_results2
 import datetime
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
+import datetime
+import pytz
+import numpy as np
 
 
 
@@ -84,33 +87,40 @@ def save_data_lstm(json_data):
 @dash.callback(Output("graph_lstm", "figure"),Input("basic-data","data"),Input("prediction", "data"))
 
 def update_graph_lstm(basicdata,prediction):
-    df = pd.read_json(basicdata, orient="split")
-    df.head()
+    df = pd.read_json(basicdata, orient="split") # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
+    df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
+    df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
+    now = datetime.datetime.now(pytz.timezone('America/New_York'))  # Aktuelles Datum und Uhrzeit in der Zeitzone New York
+    zeitpunkt = now - datetime.timedelta(days=365)  # Berechne den Zeitpunkt basierend auf der angegebenen Anzahl von Tagen
+    zeitpunktformat = np.datetime64(zeitpunkt)  # Konvertiere den Zeitpunkt in das richtige Format
+    df = df.loc[df["Date"] >= zeitpunktformat]  # Filtere den DataFrame nach dem Zeitpunkt
+    df["Date"] = pd.Series(df["Date"], dtype="string")  # Konvertiere das Datum in einen String
+    df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')  # Extrahiere das Datum im Format 'YYYY-MM-DD
     train_len = int(len(df) * 0.92)
     train_data = df[:train_len]
     test_data = df[train_len - 2:]
     prediction_data = pd.read_json(prediction, orient="split")
     figure = px.scatter(template="plotly_dark")
-    figure.add_trace(go.Scatter(x=train_data.index, y=train_data["Close"], mode="lines", name="Trainingsdaten"))
-    figure.add_trace(go.Scatter(x=test_data.index, y=test_data["Close"], mode="lines", name="Testdaten"))
+    figure.add_trace(go.Scatter(x=train_data["Date"], y=train_data["Close"], mode="lines", name="Trainingsdaten"))
+    figure.add_trace(go.Scatter(x=test_data["Date"], y=test_data["Close"], mode="lines", name="Testdaten"))
     figure.add_trace(go.Scatter(x=prediction_data.index, y= prediction_data["Predicted Close"], mode="lines", name="Vorhersage"))
     figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (EUR)", xaxis_type="category")
     figure.update_xaxes(tickformat="%Y-%m-%d")  # X-Achsenbeschriftung im gewünschten Format festlegen
     
     # Anzahl der X-Achsenbeschriftungen festlegen
-    #num_ticks = 5
+    num_ticks = 10
 
     # Werte und Beschriftungen für die X-Achsenbeschriftung auswählen
-    #step = len(regression["Date"]) // num_ticks
-    #tickvals = regression["Date"][::step]
+    step = len(df["Date"]) // num_ticks
+    tickvals = df["Date"][::step]
     #ticktext = [date.strftime("%Y-%m-%d") for date in tickvals]
 
     # Manuelle Anpassung der X-Achsenbeschriftungen
-    #figure.update_xaxes(
-        #tickmode="array",
-        #tickvals=tickvals,
-        #ticktext=ticktext
-    #)
+    figure.update_xaxes(
+        tickmode="array",
+        tickvals=tickvals,
+        ticktext=tickvals
+    )
 
     #figure.data[0].name = "Trainingsdaten"
     return figure
@@ -120,6 +130,9 @@ def update_graph_lstm(basicdata,prediction):
 def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
     df_basic= pd.read_json(jsonified_cleaned_data_basic, orient="split")
+    df.reset_index(inplace=True,names="Date")
+    df["Date"] = pd.Series(df["Date"], dtype="string") 
+    df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
     today_value = df_basic["Close"].iloc[len(df_basic)-1]
     entwicklung_tomorrow = round((df["Predicted Close"].iloc[0] - today_value) / today_value *100,2)
     entwicklung_week = round((df["Predicted Close"].iloc[6] - today_value) / today_value *100,2)
@@ -129,13 +142,21 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
         if int(element) > 0:
             element = "+"+str(element) 
         entwicklungen.append(element)
+    
+    today= datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    week = today + datetime.timedelta(days=7)
+    twoweek=  today + datetime.timedelta(days=14)
 
+    tomorrow_value = df[df["Date"] == str(tomorrow) ]
+    week_value = df[df["Date"] == str(week) ]
+    twoweek_value = df[df["Date"] == str(twoweek) ]
     table_header = [
     html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
 
-    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[0])+"%"), html.Td(df.index[0])])
-    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predicted Close"].iloc[6], 2))+"€"), html.Td(str(entwicklungen[1])+"%"),html.Td(df.index[6])])
-    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predicted Close"].iloc[13], 2))+"€"), html.Td(str(entwicklungen[2])+"%"),html.Td(df.index[13])])
+    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(tomorrow_value["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[0])+"%"), html.Td(tomorrow_value["Date"].iloc[0])])
+    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(week_value["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[1])+"%"),html.Td(week_value["Date"].iloc[0])])
+    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(twoweek_value["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[2])+"%"),html.Td(twoweek_value["Date"].iloc[0])])
 
     table_body = [html.Tbody([row1, row2, row3])]
 
