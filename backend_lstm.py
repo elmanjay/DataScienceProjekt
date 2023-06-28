@@ -91,7 +91,7 @@ def lstm_stock_prediction(ticker_symbol, start_date, end_date, prediction_days=1
     #print(test_plot)
     return prediction_table 
 
-def lstm_stock_prediction2(df, daysgiven, prediction_days=14):
+def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="Default"):
     df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
     df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
@@ -122,9 +122,11 @@ def lstm_stock_prediction2(df, daysgiven, prediction_days=14):
 
     model = create_model()
     train_model(model, x_train, y_train, x_train, y_train, epochs=20)
-    save_model(model, 'lstm_model', save_format='tf')
+    #save_model(model, 'lstm_model', save_format='tf')
+    name = str(ticker)+ "_lstm_model" 
+    save_model(model, "models/lstm/"+str(name), save_format='tf')
 
-def lstm_stock_prediction3(df, daysgiven, prediction_days=14):
+def lstm_stock_prediction3(df, daysgiven, ticker="ALV.DE", prediction_days=14):
     df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
     df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
@@ -153,8 +155,9 @@ def lstm_stock_prediction3(df, daysgiven, prediction_days=14):
     x_train, y_train = np.array(x_train), np.array(y_train)
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-    model = load_model('lstm_model')
-    
+    #model = load_model('lstm_model')
+    name = str(ticker)+ "_lstm_model" 
+    model = load_model("models/lstm/"+str(name))
 
     x_test = np.array([test_data[-interval:, 0]])
     predictions = []
@@ -188,8 +191,8 @@ def give_results(ticker_symbol, start_date, end_date, prediction_days=14):
     train_data, test_data = give_train_test(ticker_symbol, start_date, end_date)
     return train_data, test_data, predictions
 
-def give_results2(df, days, prediction_days=14):
-    predictions = lstm_stock_prediction3(df, days, prediction_days=14)
+def give_results2(df, days,ticker, prediction_days=14):
+    predictions = lstm_stock_prediction3(df, days,ticker, prediction_days=14)
     #metrics = calculate_metrics(predictions)
     train_data, test_data = give_train_test2(df, days)
     return train_data, test_data, predictions
@@ -239,10 +242,23 @@ def calculate_metrics(prediction_table):
 
     return metrics_table
 
+def pretrain_list(list_ticker):
+    for element in list_ticker:
+        msft = yf.Ticker(element)
+        df = msft.history(period="max")
+        df.reset_index(inplace= True)
+        lstm_stock_prediction_pretrain(df, 1095, prediction_days=14, ticker=element)
+
+#assets = ["ALV.DE", "AMZ.DE", "DPW.DE", "MDO.DE", "NVD.DE","^MDAXI"]
+
+#pretrain_list(assets)
+
+
+
 #msft = yf.Ticker("ALV.DE")
 #df = msft.history(period="max")
 #df.reset_index(inplace= True)
-#lstm_stock_prediction2(df, 1095, prediction_days=14)
+#lstm_stock_pretrain(df, 1095, prediction_days=14)
 #hehe = lstm_stock_prediction3(df, 365, prediction_days=14)
 #print(hehe)
 #print(a)

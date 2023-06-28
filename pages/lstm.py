@@ -73,11 +73,11 @@ layout = dbc.Container([
 ], fluid=True)
 
 
-@dash.callback(Output("train-lstm", "data"),Output("test-lstm", "data"),Output("prediction", "data"), Input("basic-data", "data"))
+@dash.callback(Output("train-lstm", "data"),Output("test-lstm", "data"),Output("prediction", "data"), Input("basic-data", "data"), Input("aktien-dropdown", "value"))
 
-def save_data_lstm(json_data):
+def save_data_lstm(json_data,ticker):
     df = pd.read_json(json_data, orient="split")
-    train, test, prediction  = give_results2(df, 365, prediction_days=14)
+    train, test, prediction  = give_results2(df, 365,ticker, prediction_days=14)
 
     return train.to_json(date_format="iso", orient="split"), test.to_json(date_format="iso", orient="split"),prediction.to_json(date_format="iso", orient="split")
 

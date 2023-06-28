@@ -8,7 +8,6 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 
 
-
 assets = ["ALV.DE", "AMZ.DE", "DPW.DE", "MDO.DE", "NVD.DE","^MDAXI"]
 aktien = ["Allianz","Amazon","Deutsche Post","McDonald‘s", "NVIDIA","MDAX"]
 
