@@ -6,6 +6,11 @@ from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import sys
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+module_dir = os.path.join(current_dir, "backend")
+sys.path.append(module_dir)
 from backend_regression import make_pred, make_pred_month
 import plotly.graph_objects as go
 
