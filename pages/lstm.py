@@ -11,7 +11,7 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 module_dir = os.path.join(current_dir, "backend")
 sys.path.append(module_dir)
-from backend_lstm import give_results2
+from backend_lstm import lstm_stock_prediction
 import datetime
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
@@ -71,20 +71,19 @@ layout = dbc.Container([
             ])
         ], width=6)
     ]),
-    dcc.Store(id="test-lstm"),
-    dcc.Store(id="train-lstm"),
+    dcc.Store(id="basic-data"),
     dcc.Store(id="prediction"),
     dcc.Store(id="metrics")
 ], fluid=True)
 
 
-@dash.callback(Output("train-lstm", "data"),Output("test-lstm", "data"),Output("prediction", "data"), Input("basic-data", "data"), Input("aktien-dropdown", "value"))
+@dash.callback(Output("prediction", "data"), Input("basic-data", "data"), Input("aktien-dropdown", "value"))
 
 def save_data_lstm(json_data,ticker):
     df = pd.read_json(json_data, orient="split")
-    train, test, prediction  = give_results2(df, 365,ticker, prediction_days=14)
+    prediction  = lstm_stock_prediction(df, 365,ticker, prediction_days=14)
 
-    return train.to_json(date_format="iso", orient="split"), test.to_json(date_format="iso", orient="split"),prediction.to_json(date_format="iso", orient="split")
+    return prediction.to_json(date_format="iso", orient="split")
 
 
 
@@ -138,7 +137,6 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df.reset_index(inplace=True,names="Date")
     df["Date"] = pd.Series(df["Date"], dtype="string") 
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
-    print(df_basic.iloc[len(df_basic)-1])
     today_value = df_basic["Close"].iloc[len(df_basic)-1]
     entwicklung_tomorrow = round((df["Predicted Close"].iloc[0] - today_value) / today_value *100,2)
     entwicklung_week = round((df["Predicted Close"].iloc[6] - today_value) / today_value *100,2)

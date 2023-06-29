@@ -11,7 +11,7 @@ import locale
 import pytz
 import numpy as np
 from backend_regression import make_pred_month
-from backend_lstm import lstm_stock_prediction3
+from backend_lstm import lstm_stock_prediction
 
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
@@ -114,125 +114,162 @@ layout = dbc.Container(
     dcc.Store(id= "time-filtered-data")
 ],fluid=True)
 
-@dash.callback(Output("time-filtered-data", "data"), Input("basic-data", "data"),Input("zeitraum","value"))
 
+# Callback für die Aktualisierung der gefilterten Daten basierend auf dem Zeitraum
+@dash.callback(Output("time-filtered-data", "data"), Input("basic-data", "data"), Input("zeitraum", "value"))
 def update_data(jsonified_cleaned_data, zeitraum):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
+    # Daten aus JSON laden
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
     df["Date"] = pd.to_datetime(df.Date).dt.tz_localize(None)
-    now = datetime.datetime.now(pytz.timezone('America/New_York'))
+    now = datetime.datetime.now(pytz.timezone("America/New_York"))
+
+    # Daten basierend auf dem ausgewählten Zeitraum filtern
     if zeitraum != "max":
         zeitpunkt = now - datetime.timedelta(days=zeitraum)
         zeitpunktformat = np.datetime64(zeitpunkt)
         df = df.loc[df["Date"] >= zeitpunktformat]
+
+    # Daten als JSON zurückgeben
     return df.to_json(date_format="iso", orient="split")
 
-@dash.callback(Output("graph", "figure"), Input("time-filtered-data", "data"))
 
+# Callback für die Aktualisierung des Graphen basierend auf den gefilterten Daten
+@dash.callback(Output("graph", "figure"), Input("time-filtered-data", "data"))
 def update_graph(jsonified_cleaned_data):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
-    figure= px.line(df, x="Date", y="Close", title="Verlauf der Aktie", template= "plotly_white")
+    # Daten aus JSON laden
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+
+    # Figure für den Plot erstellen
+    figure = px.line(df, x="Date", y="Close", title="Verlauf der Aktie", template="plotly_white")
     figure.update_xaxes(title_text="Datum")
     figure.update_yaxes(title_text="Kurs (EUR)")
+
+    # Figure zurückgeben
     return figure
 
-@dash.callback(Output("output-div-aktuellemarktdaten", "children"), Input("aktien-dropdown", "value"))
 
+# Callback für die Aktualisierung der aktuellen Marktdaten
+@dash.callback(Output("output-div-aktuellemarktdaten", "children"), Input("aktien-dropdown", "value"))
 def update_data(symbol):
+    # Aktiendaten abrufen
     stock_data = yf.Ticker(symbol)
     data = stock_data.info
-    open_price = data['regularMarketOpen']
-    close_price = data['regularMarketPreviousClose']
-    low_price = data['regularMarketDayLow']
-    high_price = data['regularMarketDayHigh']
+    open_price = data["regularMarketOpen"]
+    close_price = data["regularMarketPreviousClose"]
+    low_price = data["regularMarketDayLow"]
+    high_price = data["regularMarketDayHigh"]
+
+    # Output erstellen
     output = [
-        html.P("Open: {}€".format(open_price), className= "font-weight-bold"),
-        html.P("Previous Close: {}€".format(close_price), className= "font-weight-bold"),
-        html.P("High: {}€".format(high_price), className= "font-weight-bold"),
-        html.P("Low: {}€".format(low_price), className= "font-weight-bold"),
+        html.P(f"Open: {open_price}€", className="font-weight-bold"),
+        html.P(f"Previous Close: {close_price}€", className="font-weight-bold"),
+        html.P(f"High: {high_price}€", className="font-weight-bold"),
+        html.P(f"Low: {low_price}€", className="font-weight-bold"),
     ]
+
     return output
 
-@dash.callback(Output("output-div-historischedaten", "children"),Input("time-filtered-data", "data"))
 
+# Callback für die Aktualisierung der historischen Marktdaten
+@dash.callback(Output("output-div-historischedaten", "children"), Input("time-filtered-data", "data"))
 def update_data(jsonified_cleaned_data):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')   
+    # Daten aus JSON laden
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+
+    # Berechnungen durchführen
     all_time_high = round(df["Open"].max(), 2)
     all_time_low = round(df["Open"].min(), 2)
     all_time_mean = round(df["Open"].mean(), 2)
     all_time_std = round(df["Open"].std(), 2)
+
+    # Output erstellen
     output = [
-        html.P("High: {}€".format(all_time_high), className= "font-weight-bold"),
-        html.P("Low: {}€".format(all_time_low), className= "font-weight-bold"),
-        html.P("Average: {}€".format(all_time_mean), className= "font-weight-bold"),
-        html.P("Standard Deviation: {}".format(all_time_std), className="font-weight-bold")
+        html.P(f"High: {all_time_high}€", className="font-weight-bold"),
+        html.P(f"Low: {all_time_low}€", className="font-weight-bold"),
+        html.P(f"Average: {all_time_mean}€", className="font-weight-bold"),
+        html.P(f"Standard Deviation: {all_time_std}", className="font-weight-bold")
     ]
+
     return output
 
-@dash.callback(Output("datumszeile-akt-markt", "children"), Input("aktien-dropdown", "value") )
 
+# Callback für die Aktualisierung des Datumszeile der aktuellen Marktdaten
+@dash.callback(Output("datumszeile-akt-markt", "children"), Input("aktien-dropdown", "value"))
 def update_datum(symbol):
+    # Aktiendaten abrufen
     stock_data = yf.Ticker(symbol)
     data = stock_data.info
-    change_pct = (data['regularMarketOpen'] - data['regularMarketPreviousClose']) / data['regularMarketPreviousClose'] * 100
-    change_pct = round(change_pct,2)
-   
+    change_pct = (data["regularMarketOpen"] - data["regularMarketPreviousClose"]) / data["regularMarketPreviousClose"] * 100
+    change_pct = round(change_pct, 2)
 
-    if change_pct >0 :
+    # Vorzeichen und Pfeil basierend auf der Änderung berechnen
+    if change_pct > 0:
         vorzeichen = "+"
-        arrow= "▲"
-    else: 
+        arrow = "▲"
+    else:
         vorzeichen = ""
-        arrow= "▼"
-    
+        arrow = "▼"
 
-    return html.H5(("{}{}{}%:  {}, {}".format(arrow, vorzeichen,change_pct, now.strftime("%A"), now.date())),style={"margin-left": "10px"}, className= "font-weight-bold")
+    now = datetime.datetime.now(pytz.timezone("America/New_York"))
+    output = html.H5(f"{arrow}{vorzeichen}{change_pct}%:  {now.strftime('%A')}, {now.date()}", style={"margin-left": "10px"}, className="font-weight-bold")
 
-@dash.callback(Output("datumszeile-hist-markt", "children"),  Input("time-filtered-data", "data"),Input("zeitraum","value"))
+    return output
 
-def update_datum(jsonified_cleaned_data,zeitraum):
-    df = pd.read_json(jsonified_cleaned_data, orient='split')
-    change_pct = (df["Open"].iloc[len(df)-1] - df["Open"].iloc[0]) / df["Open"].iloc[0] * 100
-    change_pct = round(change_pct,2)
 
+# Callback für die Aktualisierung des Datums der historischen Marktdaten
+@dash.callback(Output("datumszeile-hist-markt", "children"), Input("time-filtered-data", "data"), Input("zeitraum", "value"))
+def update_datum(jsonified_cleaned_data, zeitraum):
+    # Daten aus JSON laden
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+    change_pct = (df["Open"].iloc[len(df) - 1] - df["Open"].iloc[0]) / df["Open"].iloc[0] * 100
+    change_pct = round(change_pct, 2)
+
+    # Ausgabe-Zeitpunkt basierend auf dem Zeitraum festlegen
     if zeitraum == "max":
         ausgabe_zeitpunkt = "Seit Start:"
     elif zeitraum == 90:
         ausgabe_zeitpunkt = "3 Monate:"
     elif zeitraum == 180:
         ausgabe_zeitpunkt = "6 Monate:"
-    if change_pct >0 :
-        vorzeichen = "+"    
-    else: 
-        vorzeichen = ""
-    return html.H5(("{} {}{}%".format(ausgabe_zeitpunkt, vorzeichen,change_pct, )),style={"margin-left": "10px"}, className= "font-weight-bold")
 
-@dash.callback(Output("prognose-div", "children"),Input("aktien-dropdown", "value"), Input("basic-data", "data"))
+    # Vorzeichen basierend auf der Änderung berechnen
+    if change_pct > 0:
+        vorzeichen = "+"
+    else:
+        vorzeichen = ""
+
+    output = html.H5(f"{ausgabe_zeitpunkt} {vorzeichen}{change_pct}%", style={"margin-left": "10px"}, className="font-weight-bold")
+
+    return output
+
+
+# Callback für die Aktualisierung der Prognosedaten
+@dash.callback(Output("prognose-div", "children"), Input("aktien-dropdown", "value"), Input("basic-data", "data"))
 def update_reg_main(symbol, data):
+    # Aktiendaten abrufen
     stock_data = yf.Ticker(symbol)
     data_demand = stock_data.info
-    close_price = data_demand ['regularMarketPreviousClose']
+    close_price = data_demand["regularMarketPreviousClose"]
     forecasts = []
     percentage = []
     df = pd.read_json(data, orient="split")
-    result_regression= make_pred_month(df, 30)
-    result_lstm = lstm_stock_prediction3(df, 365, ticker=symbol, prediction_days=14)
-    value_lstm= round(result_lstm["Predicted Close"].iloc[0],2)
-    forecasts.append(round(result_regression[1]["Predictions"].iloc[0],2))
+    result_regression = make_pred_month(df, 30)
+    result_lstm = lstm_stock_prediction(df, 365, ticker=symbol, prediction_days=14)
+    value_lstm = round(result_lstm["Predicted Close"].iloc[1], 2)
+    forecasts.append(round(result_regression[1]["Predictions"].iloc[0], 2))
     forecasts.append(value_lstm)
-    print(forecasts)
 
     for element in forecasts:
-        value = (element - close_price) / close_price *100
-        value= round(value,2)
-        if value >0 :
+        value = (element - close_price) / close_price * 100
+        value = round(value, 2)
+        if value > 0:
             value = "+" + str(value)
         percentage.append(value)
-    
-
 
     output = [
-        html.P("Lineare Regression({}%): {}€".format(percentage[0],forecasts[0]), className= "font-weight-bold"),
-        html.P("LSTM:({}%): {}€".format(percentage[1],forecasts[1],2)),
-        html.P("Arima: {}€".format(forecasts[0]), className= "font-weight-bold")
+        html.P(f"Lineare Regression({percentage[0]}%): {forecasts[0]}€", className="font-weight-bold"),
+        html.P(f"LSTM:({percentage[1]}%): {forecasts[1]}€", className="font-weight-bold"),
+        html.P(f"Arima: {forecasts[0]}€", className="font-weight-bold")
     ]
+
     return output

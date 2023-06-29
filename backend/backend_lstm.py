@@ -77,18 +77,7 @@ def lstm_stock_prediction(ticker_symbol, start_date, end_date, prediction_days=1
 
     last_date = df.index[-1]
     prediction_dates = pd.date_range(start=last_date + pd.Timedelta(days=1), periods=prediction_days, freq="B")
-    train_plot, test_plot= give_train_test(ticker_symbol, start_date, end_date)
     prediction_table = pd.DataFrame(predictions, columns=["Predicted Close"], index=prediction_dates)
-    #plt.figure(figsize=(10, 6))
-    #plt.plot(train_plot.index, train_plot["Close"], label="Train Data")
-    #plt.plot(test_plot.index, test_plot["Close"], label="Test Data")
-    #plt.plot(prediction_table.index, prediction_table["Predicted Close"], label="Vorhersage")
-    #plt.xlabel("Date")
-    #plt.ylabel("Closing Price")
-    #plt.title("Stock Price Data")
-    #plt.legend()
-    #plt.show()
-    #print(test_plot)
     return prediction_table 
 
 def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="Default"):
@@ -126,7 +115,7 @@ def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="De
     name = str(ticker)+ "_lstm_model" 
     save_model(model, "models/lstm/"+str(name), save_format='tf')
 
-def lstm_stock_prediction3(df, daysgiven, ticker="ALV.DE", prediction_days=14):
+def lstm_stock_prediction(df, daysgiven, ticker="ALV.DE", prediction_days=14):
     df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
     df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
     df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
@@ -155,7 +144,6 @@ def lstm_stock_prediction3(df, daysgiven, ticker="ALV.DE", prediction_days=14):
     x_train, y_train = np.array(x_train), np.array(y_train)
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-    #model = load_model('lstm_model')
     name = str(ticker)+ "_lstm_model" 
     model = load_model("models/lstm/"+str(name))
 
@@ -168,61 +156,10 @@ def lstm_stock_prediction3(df, daysgiven, ticker="ALV.DE", prediction_days=14):
         x_test = np.append(x_test[:, 1:], prediction, axis=1)
 
     predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
-
-    last_date = df.index[-1]
-    prediction_dates = pd.date_range(start=datetime.date.today() + pd.Timedelta(days=1), periods=prediction_days, freq="B")
-    #train_plot, test_plot= give_train_test(ticker_symbol, start_date, end_date)
+    prediction_dates = pd.date_range(start=datetime.date.today(), periods=prediction_days, freq="B")  #+ pd.Timedelta(days=1)
     prediction_table = pd.DataFrame(predictions, columns=["Predicted Close"], index=prediction_dates)
-    #plt.figure(figsize=(10, 6))
-    #plt.plot(train_plot.index, train_plot["Close"], label="Train Data")
-    #plt.plot(test_plot.index, test_plot["Close"], label="Test Data")
-    #plt.plot(prediction_table.index, prediction_table["Predicted Close"], label="Vorhersage")
-    #plt.xlabel("Date")
-    #plt.ylabel("Closing Price")
-    #plt.title("Stock Price Data")
-    #plt.legend()
-    #plt.show()
-    #print(test_plot)
+    
     return prediction_table 
-
-def give_results(ticker_symbol, start_date, end_date, prediction_days=14):
-    predictions = lstm_stock_prediction(ticker_symbol, start_date, end_date, prediction_days=14)
-    #metrics = calculate_metrics(predictions)
-    train_data, test_data = give_train_test(ticker_symbol, start_date, end_date)
-    return train_data, test_data, predictions
-
-def give_results2(df, days,ticker, prediction_days=14):
-    predictions = lstm_stock_prediction3(df, days,ticker, prediction_days=14)
-    #metrics = calculate_metrics(predictions)
-    train_data, test_data = give_train_test2(df, days)
-    return train_data, test_data, predictions
-
-def give_train_test(ticker_symbol, start_date, end_date):
-    ticker = yf.Ticker(ticker_symbol)
-    df = ticker.history(start=start_date, end=end_date, actions=False)
-    df = df[["Close"]]
-    train_len = int(len(df) * 0.92)
-    train_data = df[:train_len]
-    test_data = df[train_len - 2:]
-    return train_data, test_data
-
-def give_train_test2(df, daysgiven):
-    df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
-    df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
-    df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
-    now = datetime.datetime.now(pytz.timezone('America/New_York'))  # Aktuelles Datum und Uhrzeit in der Zeitzone New York
-    zeitpunkt = now - datetime.timedelta(days=daysgiven)  # Berechne den Zeitpunkt basierend auf der angegebenen Anzahl von Tagen
-    zeitpunktformat = np.datetime64(zeitpunkt)  # Konvertiere den Zeitpunkt in das richtige Format
-    df = df.loc[df["Date"] >= zeitpunktformat]  # Filtere den DataFrame nach dem Zeitpunkt
-    df["Date"] = pd.Series(df["Date"], dtype="string")  # Konvertiere das Datum in einen String
-    df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})') 
-    df = df.set_index("Date")
-    train_len = int(len(df) * 0.92)
-    train_data = df[:train_len]
-    test_data = df[train_len - 2:]
-    return train_data, test_data
-
-
 
 def calculate_metrics(prediction_table):
     true_values = prediction_table["True Close"]
@@ -254,34 +191,5 @@ def pretrain_list(list_ticker):
 #pretrain_list(assets)
 
 
-
-#msft = yf.Ticker("ALV.DE")
-#df = msft.history(period="max")
-#df.reset_index(inplace= True)
-#lstm_stock_pretrain(df, 1095, prediction_days=14)
-#hehe = lstm_stock_prediction3(df, 365, prediction_days=14)
-#print(hehe)
-#print(a)
-#print(b)
-#print(c)
-
-
-
-#train_plot, test_plot, prediction_table = give_results("ALV.DE", "2020-05-25", datetime.date.today())
-
-#print(test_plot.tail())
-#print(prediction_table)
-
-
-#plt.figure(figsize=(10, 6))
-#plt.plot(train_plot.index, train_plot["Close"], label="Train Data")
-#plt.plot(test_plot.index, test_plot["Close"], label="Test Data")
-#plt.plot(prediction_table.index, prediction_table["Predicted Close"], label="Vorhersage")
-#plt.xlabel("Date")
-#plt.ylabel("Closing Price")
-#plt.title("Stock Price Data")
-#plt.legend()
-#plt.show()
-#print(test_plot)
 
 
