@@ -32,22 +32,8 @@ layout = dbc.Container([
             html.Div([
                 html.H2("LSTM:", className="card-header"),
                 html.Hr(),
-                html.Label("Bitte wählen Sie den gewünschten Zeitraum:",
+                html.Label("Visualisierung von Trainingsdaten, Testdaten und Vorhersagen:",
                     style={"margin-left": "10px"}, className="font-weight-bold"),
-                dbc.RadioItems(
-                                id="zeitraum",
-                                options=[
-                                    {'label': "1 Monat (empfohlen)", 'value': 30},
-                                    {'label': "3 Monate ", 'value': 90},
-                                    {'label': "6 Monate", 'value': 180},
-                                    {'label': "1 Jahr", 'value': 365}
-                                ],
-                                value=30,
-                                className="radiobuttons",
-                                labelStyle={'display': 'inline-block', 'margin-right': '5px'},
-                                style={"margin-left": "10px"},
-                                inline=True
-                            ),
                 html.Hr(),
                 dcc.Graph(id="graph_lstm")
             ], className="card text-white bg-primary mb-3", style={"height": "97.5%"})
