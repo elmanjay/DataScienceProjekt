@@ -255,7 +255,7 @@ def update_reg_main(symbol, data):
     df = pd.read_json(data, orient="split")
     result_regression = make_pred_month(df, 30)
     result_lstm = lstm_stock_prediction(df, 365, ticker=symbol, prediction_days=14)
-    value_lstm = round(result_lstm["Predicted Close"].iloc[1], 2)
+    value_lstm = round(float(result_lstm["Predicted Close"].iloc[1]), 2)
     forecasts.append(round(result_regression[1]["Predictions"].iloc[0], 2))
     forecasts.append(value_lstm)
 
@@ -268,7 +268,7 @@ def update_reg_main(symbol, data):
 
     output = [
         html.P(f"Lineare Regression({percentage[0]}%): {forecasts[0]}€", className="font-weight-bold"),
-        html.P(f"LSTM:({percentage[1]}%): {forecasts[1]}€", className="font-weight-bold"),
+        html.P(f"LSTM({percentage[1]}%): {forecasts[1]}€", className="font-weight-bold"),
         html.P(f"Arima: {forecasts[0]}€", className="font-weight-bold")
     ]
 

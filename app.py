@@ -31,7 +31,7 @@ app.layout = dbc.Container([
             dbc.NavbarBrand("Aktien Analyse", className= "navbar-brand",style={"margin-left": "10px"}),
             dbc.NavItem(dbc.NavLink("Info", href="/")),
             dbc.NavItem(dbc.NavLink("Lineare Regression", href="/regression")),
-            dbc.NavItem(dbc.NavLink("Zeitreihenanalyse", href="/zeitreihe")),
+            dbc.NavItem(dbc.NavLink("ARIMA", href="/zeitreihe")),
             dbc.NavItem(dbc.NavLink("LSTM", href="/lstm")),
             dbc.Col(
                 html.P(""),
