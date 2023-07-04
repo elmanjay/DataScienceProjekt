@@ -32,14 +32,14 @@ def predict_arima(df_input, years=3,prediction_days= 15):
     forecast = model_fit.forecast(steps=10+prediction_days) # Anzahl der zukünftigen Perioden für die Prognose angeben
     liste_forecasts = forecast.tolist()
     df_forecasts = pd.DataFrame(liste_forecasts , index=listinex)
-    today = datetime.date.today()
+    #today = datetime.date.today()
 
     # Liste für die nächsten 14 Tage
     letzte_zeile = df.tail(1)
-    gewünschter_wert = letzte_zeile.at[letzte_zeile.index[0], "Date"]
-    date_list = [gewünschter_wert + timedelta(days=i) for i in range(1,15)]
-    print(date_list)
-    print(len(date_list))
+    #gewünschter_wert = letzte_zeile.at[letzte_zeile.index[0], "Date"]
+    #date_list = [gewünschter_wert + timedelta(days=i) for i in range(1,15)]
+    #print(date_list)
+    #print(len(date_list))
     df_forecasts.rename(columns={0: "Prediction"}, inplace=True)
     merged_df = pd.merge(df, df_forecasts, left_index=True, right_index=True, how="outer")
     print(merged_df.tail(40))
