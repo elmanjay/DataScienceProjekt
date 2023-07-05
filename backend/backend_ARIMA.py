@@ -56,6 +56,9 @@ def predict_arima(df_input, years=2,prediction_days= 15):
     #error = mean_squared_error(df["Test"].iloc[-10:], df_forecasts.iloc[:10])
     #print(f"[Test evaluation] mean_squared_error: {error}")
 
+    print(df["Test"].iloc[-10:])
+    print(df_forecasts.iloc[:10])
+
     # Berechne den durchschnittlichen Zeitunterschied zwischen aufeinanderfolgenden Datenpunkten in der Spalte "Date"
     time_delta = merged_df["Date"].diff().mean().round("d") 
     print(f"Calculated avarage time delta rounded to days: {time_delta}")
