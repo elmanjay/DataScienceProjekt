@@ -81,7 +81,6 @@ def predict_arima(df_input, years=2,prediction_days= 15):
     return(merged_df, metrics)
 
 
-
 #msft = yf.Ticker("NVD.DE")
 #df = msft.history(period="max")
 #df = df.reset_index()

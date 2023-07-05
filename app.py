@@ -57,6 +57,11 @@ app.layout = dbc.Container([
     ),
     html.Hr(),
     dash.page_container,
+    dbc.Navbar(
+        dbc.Col(html.P("Projektseminar Business Analytics SoSe 2023", style={"text-align": "center"},className="text-tertiary")),
+        color="primary",className="fixed-bottom",
+        dark=True,
+        style={"color": "white"}),
         # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data"),
     dcc.Store(id="regression-mainpage"),
