@@ -1,8 +1,8 @@
 import pandas as pd
 import yfinance as yf
-
+import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 def predict_arima(df_input, years=2,prediction_days= 15):
 
@@ -53,15 +53,20 @@ def predict_arima(df_input, years=2,prediction_days= 15):
     merged_df = merged_df.reset_index(drop=True)  # Setzt den Index des DataFrame zurück, um ihn neu zu nummerieren
 
     # Berechne den mse
-    #error = mean_squared_error(df["Test"].iloc[-10:], df_forecasts.iloc[:10])
+    mae = mean_absolute_error(df["Test"].iloc[-10:], df_forecasts.iloc[:10])
+    mse = mean_squared_error(df["Test"].iloc[-10:], df_forecasts.iloc[:10])
+    rmse = np.sqrt(mse)
+    scaled_mae = mae / df["Test"].iloc[-10:].mean()
+
+    metrics= [mae,mse,rmse,scaled_mae]
     #print(f"[Test evaluation] mean_squared_error: {error}")
 
-    print(df["Test"].iloc[-10:])
-    print(df_forecasts.iloc[:10])
+    #print(df["Test"].iloc[-10:])
+    #print(df_forecasts.iloc[:10])
 
     # Berechne den durchschnittlichen Zeitunterschied zwischen aufeinanderfolgenden Datenpunkten in der Spalte "Date"
     time_delta = merged_df["Date"].diff().mean().round("d") 
-    print(f"Calculated avarage time delta rounded to days: {time_delta}")
+    #print(f"Calculated avarage time delta rounded to days: {time_delta}")
 
     for index, date in enumerate(merged_df["Date"]):  # Iteriere über den Index und das Datum der Spalte "Date" des DataFrames
         if pd.isnull(date):  # Überprüfe, ob das Datum fehlt (null) ist
@@ -71,14 +76,13 @@ def predict_arima(df_input, years=2,prediction_days= 15):
             while not is_business_day(final_date):  # Überprüfe, ob das berechnete Datum ein Werktag ist
                 final_date = final_date + pd.Timedelta(days=1)  # Falls nicht, erhöhe das Datum um `time_delta` und überprüfe erneut
 
-            merged_df.at[index, "Date"] = final_date  # Setze das berechnete Datum als neues Datum für die aktuelle Zeile im DataFrame
-            
-    print(merged_df.tail(40))
-    return(df_forecasts)
+            merged_df.at[index, "Date"] = final_date  # Setze das berechnete Datum als neues Datum für die aktuelle Zeile im DataFrame       
+    #print(merged_df.tail(40))
+    return(merged_df, metrics)
 
 
 
-msft = yf.Ticker("NVD.DE")
-df = msft.history(period="max")
-df = df.reset_index()
-result = predict_arima(df)
+#msft = yf.Ticker("NVD.DE")
+#df = msft.history(period="max")
+#df = df.reset_index()
+#result = predict_arima(df)

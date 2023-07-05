@@ -12,7 +12,7 @@ import pytz
 import numpy as np
 from backend_regression import make_pred_month
 from backend_lstm import lstm_stock_prediction
-
+from backend_arima import predict_arima
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
 
@@ -255,9 +255,11 @@ def update_reg_main(symbol, data):
     df = pd.read_json(data, orient="split")
     result_regression = make_pred_month(df, 30)
     result_lstm = lstm_stock_prediction(df, 365, ticker=symbol, prediction_days=14)
+    result_arima , metrics = predict_arima(df)
     value_lstm = round(float(result_lstm["Predicted Close"].iloc[1]), 2)
     forecasts.append(round(result_regression[1]["Predictions"].iloc[0], 2))
-    forecasts.append(value_lstm)
+    forecasts.append(round(value_lstm, 2))
+    forecasts.append(round(result_arima["Prediction"].iloc[result_arima["Test"].last_valid_index()+2],2))
 
     for element in forecasts:
         value = (element - close_price) / close_price * 100
@@ -269,7 +271,7 @@ def update_reg_main(symbol, data):
     output = [
         html.P(f"Lineare Regression({percentage[0]}%): {forecasts[0]}€", className="font-weight-bold"),
         html.P(f"LSTM({percentage[1]}%): {forecasts[1]}€", className="font-weight-bold"),
-        html.P(f"Arima: {forecasts[0]}€", className="font-weight-bold")
+        html.P(f"Arima({percentage[2]}%): {forecasts[2]}€", className="font-weight-bold")
     ]
 
     return output

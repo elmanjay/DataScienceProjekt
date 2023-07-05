@@ -6,6 +6,7 @@ from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import math
 import sys
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -140,7 +141,7 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     entwicklung_twoweek = round((df["Predictions"].iloc[13] - today_value) / today_value *100, 2)
     entwicklungen = []
     for element in entwicklung_tomorrow, entwicklung_week, entwicklung_twoweek:
-        if int(element) > 0:
+        if math.floor(element) >= 0:
             element = "+"+str(element) 
         entwicklungen.append(element)
 
