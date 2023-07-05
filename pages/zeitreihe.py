@@ -148,7 +148,7 @@ def update_div_performace(metrics_list):
     loaded_list = json.loads(metrics_list)
     mse= round(loaded_list[1],2)
     mae = round(loaded_list[0],2)
-    smae = round(loaded_list[3],3)
+    smae = round(loaded_list[3]*100,2)
     rmse= round(loaded_list[2],2)
     output = [
         html.P("Mean Squared Error: {}".format(mse), className= "font-weight-bold"),
