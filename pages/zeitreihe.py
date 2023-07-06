@@ -4,7 +4,7 @@ import yfinance as yf
 import dash
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import statsmodels.api as sm
@@ -32,8 +32,47 @@ layout = dbc.Container([
             html.Div([
                 html.H2("ARIMA:", className="card-header"),
                 html.Hr(),
-                html.Label("Visualisierung von Trainingsdaten, Testdaten und Vorhersagen:",
-                    style={"margin-left": "10px"}, className="font-weight-bold"),
+    dbc.Container(
+    [
+        dbc.Row(
+            [
+                dbc.Col(dbc.Container([dbc.Row([dbc.Label("Auswahl der Datengrundlage:", className="font-weight-bold")]),
+                  dbc.Row([dbc.RadioItems(
+                                            id="zeitraum-arima",
+                                            options=[
+                                                {"label": "1 Jahr", "value": 1},
+                                                {"label": "2 Jahre (empfohlen)", "value": 2},
+                                                {"label": "5 Jahre", "value": 5},
+                                            ],
+                                            value=2,
+                                            className="radiobuttons",
+                                            labelStyle={"display": "inline-block", "margin-right": "5px"},
+                                            inline=True,
+                                        )])                     
+                                       
+                                       ])
+                        ),
+                dbc.Col(dbc.Container([dbc.Row([dbc.Label("Auswahl der Paramenter:", className="font-weight-bold")]),
+                  dbc.Row([dbc.Container(
+    [
+        dbc.Row(
+            [
+                dbc.Col([dbc.Input(type="text",inputMode="numeric",pattern="[0-9]*",placeholder="P=1",className="small-input",id="input-p")]),
+                dbc.Col([dbc.Input(type="text",inputMode="numeric",pattern="[0-9]*",placeholder="D=2",className="small-input",id="input-d")]),
+                dbc.Col([dbc.Input(type="text",inputMode="numeric",pattern="[0-9]*",placeholder="Q=1",className="small-input",id="input-q")]),
+            ]
+        )
+    ]
+)])                     
+                                       
+                                       ])
+                        ),
+            ]
+        )
+    ],
+        fluid=True,
+    ),
+
                 html.Hr(),
                 dcc.Graph(id="graph_arima")
             ], className="card text-white bg-primary mb-3", style={"height": "97.5%"})
@@ -62,11 +101,23 @@ layout = dbc.Container([
     dcc.Store(id="metrics-arima")
 ], fluid=True)
 
-@dash.callback(Output("prediction-arima","data"),Output("metrics-arima","data"),Input("basic-data","data"))
+@dash.callback(Output("alert-value-int","is_open") ,Input("input-p","value"),Input("input-d","value"),Input("input-q","value"))
 
-def update_prediction_data(basic_data):
+def update_prediction_data(p_value, d_value, q_value):
+    error= False
+    if p_value and not p_value.isdigit():
+        error = True
+    elif d_value and not d_value.isdigit():
+        error = True
+    elif q_value and not q_value.isdigit():
+        error = True
+    return error
+
+@dash.callback(Output("prediction-arima","data"),Output("metrics-arima","data"),Input("basic-data","data"),Input("zeitraum-arima","value"))
+
+def update_prediction_data(basic_data,zeitraum):
     df = pd.read_json(basic_data, orient="split")
-    prediction, metrics = predict_arima(df)
+    prediction, metrics = predict_arima(df, years= zeitraum)
     return prediction.to_json(date_format="iso", orient="split"), json.dumps(metrics)
 
 

@@ -3,7 +3,7 @@ import yfinance as yf
 import dash
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import sys
@@ -55,8 +55,15 @@ app.layout = dbc.Container([
         dark=True,
         style={"color": "white"}
     ),
+    dbc.Alert(
+        "Bitte eine Ganzzahl eingeben!",
+                                                                        id="alert-value-int",
+                                                                        dismissable=True,
+                                                                        is_open=False,
+                                                                    ),
     html.Hr(),
     dash.page_container,
+    html.Hr(),
     dbc.Navbar(
         dbc.Col(html.P("Projektseminar Business Analytics SoSe 2023", style={"text-align": "center"},className="text-tertiary")),
         color="primary",className="fixed-bottom",
