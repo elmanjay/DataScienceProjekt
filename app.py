@@ -60,10 +60,11 @@ app.layout = dbc.Container([
                                                                         id="alert-value-int",
                                                                         dismissable=True,
                                                                         is_open=False,
+                                                                        className= "alert alert-dismissible alert-danger"
                                                                     ),
     html.Hr(),
     dash.page_container,
-    html.Hr(),
+    html.Hr(className="fixed-bottom"),
     dbc.Navbar(
         dbc.Col(html.P("Projektseminar Business Analytics SoSe 2023", style={"text-align": "center"},className="text-tertiary")),
         color="primary",className="fixed-bottom",
