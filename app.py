@@ -63,13 +63,12 @@ app.layout = dbc.Container([
                                                                         className= "alert alert-dismissible alert-danger"
                                                                     ),
     html.Hr(),
+    dbc.Container([
     dash.page_container,
-    html.Hr(className="fixed-bottom"),
-    dbc.Navbar(
-        dbc.Col(html.P("Projektseminar Business Analytics SoSe 2023", style={"text-align": "center"},className="text-tertiary")),
-        color="primary",className="fixed-bottom",
-        dark=True,
-        style={"color": "white"}),
+    html.Br(),
+    html.Div(
+        dbc.Col(html.P("Projektseminar Business Analytics SoSe 2023", style={"text-align": "center","margin-top": "10px"},className="text-tertiary")),
+        className="fixed-bottom text-white bg-primary")],fluid=True),
         # dcc.Store stores the intermediate value
     dcc.Store(id="basic-data"),
     dcc.Store(id="regression-mainpage"),
