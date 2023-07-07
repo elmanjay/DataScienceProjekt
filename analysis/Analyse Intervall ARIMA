@@ -1,0 +1,34 @@
+import yfinance as yf
+import pandas as pd
+from sklearn import metrics
+import numpy as np
+import matplotlib.pyplot as plt
+from pmdarima import auto_arima
+
+assets = ["AAPL", "AMZN", "GOOGL", "MSFT"]
+intervalls=  ["1mo", "3mo", "6mo"]
+means= []
+results = pd.DataFrame(index=assets,columns=intervalls)
+
+#Durchführen ARIMA für jede Aktie und jedes Intervall
+for element in assets:
+    for time in intervalls:
+            msft = yf.Ticker(element)
+            df = msft.history(period="max")
+            df = df.reset_index()
+            df = df[['Date', 'Close']]
+            df['Date'] = pd.to_datetime(df['Date'])
+            train = df.iloc[:-10, 1]
+            test = df.iloc[-10:, 1]
+            model = auto_arima(train, trace=True, error_action='ignore', suppress_warnings=True)
+            model.fit(train)
+            p, d, q = model.order
+            test_forecast = model.predict(n_periods=10)
+            test_forecast = pd.DataFrame(test_forecast, index=test.index, columns=['Predictions'])
+            rmse = np.sqrt(np.mean(np.square(test.values - test_forecast['Predictions'].values)))
+            results.at[element, time] = rmse
+
+
+
+
+            
