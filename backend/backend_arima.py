@@ -4,7 +4,7 @@ import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-def predict_arima(df_input, years=2,prediction_days= 15):
+def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
 
     def is_business_day(date):
         return bool(len(pd.bdate_range(date, date)))
@@ -26,7 +26,7 @@ def predict_arima(df_input, years=2,prediction_days= 15):
     #new_df = pd.DataFrame(df["Test"]) # Erstelle Spalte 'Train' mit den Trainingsdaten
 
 
-    model = ARIMA(df["Train"] , order=(1, 2, 1))  # p, d, q sind die gewählten Ordnungsparameter
+    model = ARIMA(df["Train"] , order=(p,d,q))  # p, d, q sind die gewählten Ordnungsparameter
     model_fit = model.fit()
     
 
