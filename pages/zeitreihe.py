@@ -113,11 +113,21 @@ def update_prediction_data(p_value, d_value, q_value):
         error = True
     return error
 
-@dash.callback(Output("prediction-arima","data"),Output("metrics-arima","data"),Input("basic-data","data"),Input("zeitraum-arima","value"))
+@dash.callback(Output("prediction-arima","data"),Output("metrics-arima","data"),Input("basic-data","data"),Input("zeitraum-arima","value"),Input("input-p","value"),Input("input-d","value"),Input("input-q","value"))
 
-def update_prediction_data(basic_data,zeitraum):
+def update_prediction_data(basic_data,zeitraum,p_value, d_value, q_value):
+    p_real= 1
+    d_real = 2
+    q_real = 1
+
+    if p_value and  p_value.isdigit() :
+        p_real= int(p_value)
+    if d_value and  d_value.isdigit() :
+        d_real= int(d_value)
+    if q_value and  q_value.isdigit() :
+        q_real= int(q_value)
     df = pd.read_json(basic_data, orient="split")
-    prediction, metrics = predict_arima(df, years= zeitraum)
+    prediction, metrics = predict_arima(df,p=p_real,d=d_real,q=q_real , years= zeitraum)
     return prediction.to_json(date_format="iso", orient="split"), json.dumps(metrics)
 
 
