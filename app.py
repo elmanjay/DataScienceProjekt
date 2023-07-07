@@ -56,7 +56,7 @@ app.layout = dbc.Container([
         style={"color": "white"}
     ),
     dbc.Alert(
-        "Bitte eine Ganzzahl eingeben!",
+        "Bitte eine positive Ganzzahl eingeben!",
                                                                         id="alert-value-int",
                                                                         dismissable=True,
                                                                         is_open=False,
