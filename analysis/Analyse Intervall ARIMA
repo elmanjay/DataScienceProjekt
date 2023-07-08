@@ -4,9 +4,13 @@ from sklearn import metrics
 import numpy as np
 import matplotlib.pyplot as plt
 from pmdarima import auto_arima
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import MinMaxScaler
 
-assets = ["AAPL", "AMZN", "GOOGL", "MSFT"]
-intervalls=  ["1mo", "3mo", "6mo"]
+
+assets = ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA", "JPM", "JNJ", "BAC", "WMT", "PG", "MA", "NVDA", "HD", "PYPL", "DIS", "INTC", "VZ", 
+          "CMCSA", "CVX", "MRK", "ASML", "KO", "PEP", "ABBV", "AZN", "NOW", "SHEL", "AMD", "META", "LLY", "UNH", "V", "XOM", "PG", "CRM", "SAP", "TBC", "HSBC"]
+intervalls=  ["1mo", "3mo", "6mo", "1y", "2y"]
 means= []
 results = pd.DataFrame(index=assets,columns=intervalls)
 
@@ -14,7 +18,7 @@ results = pd.DataFrame(index=assets,columns=intervalls)
 for element in assets:
     for time in intervalls:
             msft = yf.Ticker(element)
-            df = msft.history(period="max")
+            df = msft.history(period=time)
             df = df.reset_index()
             df = df[['Date', 'Close']]
             df['Date'] = pd.to_datetime(df['Date'])
@@ -25,10 +29,30 @@ for element in assets:
             p, d, q = model.order
             test_forecast = model.predict(n_periods=10)
             test_forecast = pd.DataFrame(test_forecast, index=test.index, columns=['Predictions'])
-            rmse = np.sqrt(np.mean(np.square(test.values - test_forecast['Predictions'].values)))
-            results.at[element, time] = rmse
+            mse = mean_squared_error( test, test_forecast["Predictions"])
+            results.at[element, time] = mse
+            
+
+#Normalisierung der MSE
+print(results)
+results = results.transpose()
+for element in results:
+    scaler = MinMaxScaler()
+    results[element] = scaler.fit_transform(results[[element]])
 
 
+#Berechnung der durschnittlichen MSE für jedes Intervall
+results = results.transpose()
+for element in results:
+    means.append(results[element].mean())
+
+
+ywerte = means
+xwerte = intervalls
+plt.bar(xwerte, ywerte)
+plt.xlabel("Zeitintervalle")
+plt.ylabel("⌀ Normalisierter RMSE über alle Aktien")
+plt.show()
 
 
             
