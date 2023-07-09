@@ -255,7 +255,7 @@ def update_reg_main(symbol, data):
     df = pd.read_json(data, orient="split")
     result_regression = make_pred_month(df, 30)
     result_lstm = lstm_stock_prediction(df, 365, ticker=symbol, prediction_days=14)
-    result_arima , metrics = predict_arima(df)
+    result_arima , metrics = predict_arima(df,1,2,1)
     value_lstm = round(float(result_lstm["Predicted Close"].iloc[1]), 2)
     forecasts.append(round(result_regression[1]["Predictions"].iloc[0], 2))
     forecasts.append(round(value_lstm, 2))
