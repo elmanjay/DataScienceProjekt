@@ -63,7 +63,7 @@ def lstm_stock_prediction(ticker_symbol, start_date, end_date, prediction_days=1
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
     model = create_model()
-    train_model(model, x_train, y_train, x_train, y_train, epochs=20)
+    train_model(model, x_train, y_train, x_train, y_train, epochs=200)
 
     x_test = np.array([test_data[-interval:, 0]])
     predictions = []
@@ -110,7 +110,7 @@ def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="De
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
     model = create_model()
-    train_model(model, x_train, y_train, x_train, y_train, epochs=20)
+    train_model(model, x_train, y_train, x_train, y_train, epochs=200)
     #save_model(model, 'lstm_model', save_format='tf')
     name = str(ticker)+ "_lstm_model" 
     save_model(model, "models/lstm/"+str(name), save_format='tf')
