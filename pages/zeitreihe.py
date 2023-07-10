@@ -171,7 +171,6 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
     today_value = df_basic["Close"].iloc[len(df_basic)-1]
     first_valid_index = df["Prediction"].first_valid_index()
-    #print(first_valid_index)
     entwicklung_tomorrow = round((df["Prediction"].iloc[first_valid_index] - today_value) / today_value *100,2)
     entwicklung_week = round((df["Prediction"].iloc[first_valid_index+7] - today_value) / today_value *100,2)
     entwicklung_twoweek = round((df["Prediction"].iloc[first_valid_index+14] - today_value) / today_value *100, 2)
