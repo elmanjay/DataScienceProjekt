@@ -125,12 +125,14 @@ def lstm_stock_prediction(df, daysgiven, ticker="ALV.DE", prediction_days=14):
     df = df.loc[df["Date"] >= zeitpunktformat]  # Filtere den DataFrame nach dem Zeitpunkt
     df["Date"] = pd.Series(df["Date"], dtype="string")  # Konvertiere das Datum in einen String
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})') 
+    df["Date"] = pd.to_datetime(df["Date"])
     df = df.set_index("Date")
 
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(df.values)
 
-    train_len = int(len(scaled_data) * 0.92)
+    train_len = int(len(scaled_data) * 0.8)
+    test_cutoff = train_len
     train_data = scaled_data[:train_len, :]
     test_data = scaled_data[train_len - 2:, :]
 
@@ -147,6 +149,22 @@ def lstm_stock_prediction(df, daysgiven, ticker="ALV.DE", prediction_days=14):
     name = str(ticker)+ "_lstm_model" 
     model = load_model("models/lstm/"+str(name))
 
+    test_predictions = []
+
+    full_data_intervalled = []
+
+    for i in range(test_cutoff, len(scaled_data)):
+      full_data_intervalled.append(scaled_data[i - interval:i, 0])
+
+    x_intervalled = np.array(full_data_intervalled)
+    x_intervalled = np.reshape(x_intervalled, (x_intervalled.shape[0], x_intervalled.shape[1], 1))
+
+    for i in range(len(full_data_intervalled)):
+      x = x_intervalled[i]
+      x = x.T
+      prediction = model.predict(x)
+      test_predictions.append(prediction[0][0])
+
     x_test = np.array([test_data[-interval:, 0]])
     predictions = []
 
@@ -156,10 +174,33 @@ def lstm_stock_prediction(df, daysgiven, ticker="ALV.DE", prediction_days=14):
         x_test = np.append(x_test[:, 1:], prediction, axis=1)
 
     predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
-    prediction_dates = pd.date_range(start=datetime.date.today(), periods=prediction_days, freq="B")  #+ pd.Timedelta(days=1)
-    prediction_table = pd.DataFrame(predictions, columns=["Predicted Close"], index=prediction_dates)
-    
-    return prediction_table 
+    test_predictions = scaler.inverse_transform(np.array(test_predictions).reshape(-1, 1))
+
+    first_date = df.index[test_cutoff]
+    last_date = df.index[-1]
+    all_dates = df.index[:]
+    prediction_dates = pd.date_range(start=last_date + pd.Timedelta(days=1), periods=prediction_days, freq='B')
+    test_predictions_dates = df.index[test_cutoff:test_cutoff + test_predictions.shape[0]]
+
+    future_prediction_table = pd.DataFrame(predictions, columns=['Predicted Future'], index=prediction_dates)
+
+    test_prediction_table = pd.DataFrame(test_predictions, columns=['Predicted Close'], index=test_predictions_dates)
+    test_prediction_table['True Close'] = df['Close'].values[test_cutoff:test_predictions.shape[0]+test_cutoff]
+
+    full_table = pd.DataFrame(index=all_dates)
+    full_table['Train'] = np.nan
+    full_table['Test'] = np.nan
+    full_table['Predicted Test'] = np.nan
+    cutoff = test_prediction_table.head(int(len(test_prediction_table) * 0.9)).index[-1]
+    full_table.loc[full_table.index < cutoff, "Train"] = df[df.index < cutoff]["Close"]
+    full_table.loc[full_table.index >= cutoff,"Test"] = df[df.index >= cutoff]["Close"]
+    full_table.loc[full_table.index >= cutoff, "Predicted Test"] = test_prediction_table[test_prediction_table.index >= cutoff]['Predicted Close']
+
+    full_table = pd.concat([full_table, future_prediction_table])
+    metrics_table = calculate_metrics(test_prediction_table)
+
+
+    return  full_table, metrics_table, future_prediction_table
 
 def calculate_metrics(prediction_table):
     true_values = prediction_table["True Close"]
@@ -186,6 +227,15 @@ def pretrain_list(list_ticker):
         df.reset_index(inplace= True)
         lstm_stock_prediction_pretrain(df, 1095, prediction_days=14, ticker=element)
 
+#msft = yf.Ticker("ALV.DE")
+#df = msft.history(period="max")
+#df.reset_index(inplace= True)
+
+#full, metrics, future = lstm_stock_prediction(df, 365, ticker="ALV.DE", prediction_days=14)
+
+#print(full.tail())
+#print(metrics)
+#print(future)
 #assets = ["ALV.DE", "AMZ.DE", "DPW.DE", "MDO.DE", "NVD.DE","^MDAXI"]
 
 #pretrain_list(assets)

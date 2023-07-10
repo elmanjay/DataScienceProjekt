@@ -44,7 +44,7 @@ layout = dbc.Container([
                     html.Div([
                         html.H2("Performance:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
-                        html.Div(id="output-div-performance", style={"margin-left": "10px"})
+                        html.Div(id="output-div-performance-lstm", style={"margin-left": "10px"})
                     ], className="card text-white bg-primary mb-3")
                 ]),
                 dbc.Row([
@@ -58,42 +58,34 @@ layout = dbc.Container([
         ], width=6)
     ]),
     dcc.Store(id="basic-data"),
-    dcc.Store(id="prediction"),
-    dcc.Store(id="metrics")
+    dcc.Store(id="prediction_lstm"),
+    dcc.Store(id="metrics_lstm"),
+    dcc.Store(id="future_lstm")
 ], fluid=True)
 
 
-@dash.callback(Output("prediction", "data"), Input("basic-data", "data"), Input("aktien-dropdown", "value"))
+@dash.callback(Output("prediction_lstm", "data"),Output("metrics_lstm", "data"),Output("future_lstm", "data"), Input("basic-data", "data"), Input("aktien-dropdown", "value"))
 
 def save_data_lstm(json_data,ticker):
     df = pd.read_json(json_data, orient="split")
-    prediction  = lstm_stock_prediction(df, 365,ticker, prediction_days=14)
-
-    return prediction.to_json(date_format="iso", orient="split")
+    prediction_full,metrics, futureprediction   = lstm_stock_prediction(df, 1080,ticker, prediction_days=14)
+    return prediction_full.to_json(date_format="iso", orient="split"), metrics.to_json(date_format="iso", orient="split"), futureprediction.to_json(date_format="iso", orient="split")
 
 
 
      
-@dash.callback(Output("graph_lstm", "figure"),Input("basic-data","data"),Input("prediction", "data"))
+@dash.callback(Output("graph_lstm", "figure"),Input("prediction_lstm", "data"))
 
-def update_graph_lstm(basicdata,prediction):
-    df = pd.read_json(basicdata, orient="split") # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
-    df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
-    df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)  # Konvertiere das Datum in das richtige Format
-    now = datetime.datetime.now(pytz.timezone('America/New_York'))  # Aktuelles Datum und Uhrzeit in der Zeitzone New York
-    zeitpunkt = now - datetime.timedelta(days=365)  # Berechne den Zeitpunkt basierend auf der angegebenen Anzahl von Tagen
-    zeitpunktformat = np.datetime64(zeitpunkt)  # Konvertiere den Zeitpunkt in das richtige Format
-    df = df.loc[df["Date"] >= zeitpunktformat]  # Filtere den DataFrame nach dem Zeitpunkt
-    df["Date"] = pd.Series(df["Date"], dtype="string")  # Konvertiere das Datum in einen String
-    df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')  # Extrahiere das Datum im Format 'YYYY-MM-DD
-    train_len = int(len(df) * 0.92)
-    train_data = df[:train_len]
-    test_data = df[train_len - 2:]
+def update_graph_lstm(prediction):
     prediction_data = pd.read_json(prediction, orient="split")
+    prediction_data.reset_index(inplace=True,names="Date")
+    prediction_data["Date"] = pd.Series(prediction_data["Date"], dtype="string") 
+    prediction_data["Date"] = prediction_data["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
     figure = px.scatter(template="plotly_dark")
-    figure.add_trace(go.Scatter(x=train_data["Date"], y=train_data["Close"], mode="lines", name="Trainingsdaten"))
-    figure.add_trace(go.Scatter(x=test_data["Date"], y=test_data["Close"], mode="lines", name="Testdaten"))
-    figure.add_trace(go.Scatter(x=prediction_data.index, y= prediction_data["Predicted Close"], mode="lines", name="Vorhersage"))
+    figure.add_trace(go.Scatter(x=prediction_data["Date"], y=prediction_data["Train"], mode="lines", name="Trainingsdaten"))
+    figure.add_trace(go.Scatter(x=prediction_data["Date"], y=prediction_data["Test"], mode="lines", name="Testdaten"))
+    figure.add_trace(go.Scatter(x=prediction_data["Date"], y=prediction_data["Predicted Test"], mode="lines", name="Vorhersage Testdaten"))
+    figure.add_trace(go.Scatter(x=prediction_data["Date"], y= prediction_data["Predicted Future"], mode="lines", name="Vorhersage Zukunft"))
     figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (EUR)", xaxis_type="category")
     figure.update_xaxes(tickformat="%Y-%m-%d")  # X-Achsenbeschriftung im gewünschten Format festlegen
     
@@ -101,8 +93,8 @@ def update_graph_lstm(basicdata,prediction):
     num_ticks = 10
 
     # Werte und Beschriftungen für die X-Achsenbeschriftung auswählen
-    step = len(df["Date"]) // num_ticks
-    tickvals = df["Date"][::step]
+    step = len(prediction_data["Date"]) // num_ticks
+    tickvals = prediction_data["Date"][::step]
     #ticktext = [date.strftime("%Y-%m-%d") for date in tickvals]
 
     # Manuelle Anpassung der X-Achsenbeschriftungen
@@ -115,7 +107,7 @@ def update_graph_lstm(basicdata,prediction):
     #figure.data[0].name = "Trainingsdaten"
     return figure
 
-@dash.callback(Output("future-pred-table-lstm", "children"), Input("prediction", "data"), Input("basic-data", "data"))
+@dash.callback(Output("future-pred-table-lstm", "children"), Input("future_lstm", "data"), Input("basic-data", "data"))
 
 def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
@@ -124,9 +116,9 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df["Date"] = pd.Series(df["Date"], dtype="string") 
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
     today_value = df_basic["Close"].iloc[len(df_basic)-1]
-    entwicklung_tomorrow = round((df["Predicted Close"].iloc[0] - today_value) / today_value *100,2)
-    entwicklung_week = round((df["Predicted Close"].iloc[6] - today_value) / today_value *100,2)
-    entwicklung_twoweek = round((df["Predicted Close"].iloc[13] - today_value) / today_value *100, 2)
+    entwicklung_tomorrow = round((df["Predicted Future"].iloc[0] - today_value) / today_value *100,2)
+    entwicklung_week = round((df["Predicted Future"].iloc[6] - today_value) / today_value *100,2)
+    entwicklung_twoweek = round((df["Predicted Future"].iloc[13] - today_value) / today_value *100, 2)
     entwicklungen = []
     for element in entwicklung_tomorrow, entwicklung_week, entwicklung_twoweek:
         if int(element) > 0:
@@ -144,13 +136,29 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     table_header = [
     html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
 
-    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(tomorrow_value["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[0])+"%"), html.Td(tomorrow_value["Date"].iloc[0])])
-    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(week_value["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[1])+"%"),html.Td(week_value["Date"].iloc[0])])
-    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(twoweek_value["Predicted Close"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[2])+"%"),html.Td(twoweek_value["Date"].iloc[0])])
+    row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(tomorrow_value["Predicted Future"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[0])+"%"), html.Td(tomorrow_value["Date"].iloc[0])])
+    row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(week_value["Predicted Future"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[1])+"%"),html.Td(week_value["Date"].iloc[0])])
+    row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(twoweek_value["Predicted Future"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[2])+"%"),html.Td(twoweek_value["Date"].iloc[0])])
 
     table_body = [html.Tbody([row1, row2, row3])]
 
     table = dbc.Table(table_header + table_body, bordered=True, className="table-secondary table-hover card-body")
     return table
 
+
+@dash.callback(Output("output-div-performance-lstm", "children"), Input("metrics_lstm", "data"))
+
+def update_div_performace(jsonified_cleaned_data):
+    df = pd.read_json(jsonified_cleaned_data, orient="split")
+    mse= round(df["MSE"].iloc[0],2)
+    mae = round(df["MAE"].iloc[0],2)
+    smae = round(df["Scaled MAE"].iloc[0] * 100,2)
+    rmse= round(df["RMSE"].iloc[0],2)
+    output = [
+        html.P("Mean Squared Error: {}".format(mse), className= "font-weight-bold"),
+        html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold"),
+        html.P("Mean Absolute Error: {}".format(mae), className= "font-weight-bold"),
+        html.P("Scaled Mean Absolute Error: {}%".format(smae), className= "font-weight-bold"),
+    ]
+    return output
 
