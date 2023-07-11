@@ -5,11 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pmdarima import auto_arima
 from sklearn.metrics import mean_squared_error
-from sklearn.metrics import r2_score
 from sklearn.preprocessing import MinMaxScaler
 
+
 assets = ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA", "JPM", "JNJ", "BAC", "WMT", "PG", "MA", "NVDA", "HD", "PYPL", "DIS", "INTC", "VZ", 
-          "CMCSA", "CVX", "MRK", "ASML", "KO", "PEP", "ABBV", "AZN", "NOW", "SHEL", "AMD", "META", "LLY", "UNH", "V", "XOM", "PG", "CRM", "SAP", "TBC", "HSBC"]
+          "CMCSA", "CVX", "MRK"]
 intervalls=  ["1mo", "3mo", "6mo", "1y", "2y"]
 means= []
 results = pd.DataFrame(index=assets,columns=intervalls)
