@@ -15,15 +15,18 @@ sys.path.append(module_dir)
 from backend_regression import make_pred, make_pred_month
 import plotly.graph_objects as go
 
-
+# Liste der Aktiensymbole und ihrer Namen
 assets = ["AAPL", "GOOGL", "TSLA", "MSFT"]
 aktien = ["Amazon", "Google", "Tesla", "Microsoft"]
+
+#Hinzufügen der Seite
 dash.register_page(__name__)
 
 
 layout = dbc.Container([
     dbc.Row([
         dbc.Col([
+            #Div welches den Graphen und die Radiobuttons enthält
             html.Div([
                 html.H2("Lineare Regression:", className="card-header"),
                 html.Hr(),
@@ -50,6 +53,7 @@ layout = dbc.Container([
         dbc.Col([
             dbc.Container([
                 dbc.Row([
+                    #Div mit den Performance Maßen
                     html.Div([
                         html.H2("Performance:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
@@ -57,6 +61,7 @@ layout = dbc.Container([
                     ], className="card text-white bg-primary mb-3")
                 ]),
                 dbc.Row([
+                    #Div mit den Prognose Werten
                     html.Div([
                         html.H2("Prognose:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
@@ -67,10 +72,12 @@ layout = dbc.Container([
         ], width=6)
     ]),
     dcc.Store(id="basic-data"),
+    #Zwischenspeicher der Vorhersagedaten
     dcc.Store(id="regression-data"),
     dcc.Store(id="future-data")
 ], fluid=True)
 
+#Durchführung der Prognose und Speicherung der Daten
 @dash.callback(Output("regression-data", "data"),Output("future-data", "data"), Input("basic-data", "data"), Input("zeitraum","value") )
 
 def generate_data(jsonified_cleaned_data,zeitraum):
@@ -80,7 +87,7 @@ def generate_data(jsonified_cleaned_data,zeitraum):
     futuredata = futurregression.to_json(date_format="iso", orient="split")
     return regressiondata , futuredata
 
-
+#Erstellen des Graphen
 @dash.callback(Output("graph_regression", "figure"), Input("regression-data", "data"))
 
 def update_graph(jsonified_cleaned_data):
@@ -90,7 +97,7 @@ def update_graph(jsonified_cleaned_data):
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Test"], mode="markers", name="Testdaten"))
     figure.add_trace(go.Scatter(x=regression["Date"], y=regression["Predictions"], mode="lines", name="Vorhersage"))
     figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (EUR)", xaxis_type="category")
-    figure.update_xaxes(tickformat="%Y-%m-%d")  # X-Achsenbeschriftung im gewünschten Format festlegen
+    figure.update_xaxes(tickformat="%Y-%m-%d")  
     
     # Anzahl der X-Achsenbeschriftungen festlegen
     num_ticks = 5
@@ -110,7 +117,7 @@ def update_graph(jsonified_cleaned_data):
     figure.data[0].name = "Trainingsdaten"
     return figure
 
-
+#Erstellen des Performance Divs
 @dash.callback(Output("output-div-performance", "children"), Input("regression-data", "data"))
 
 def update_div_performace(jsonified_cleaned_data):
@@ -129,6 +136,7 @@ def update_div_performace(jsonified_cleaned_data):
     ]
     return output
 
+#Erstellen der Vorhersage Tabelle
 @dash.callback(Output("future-pred-table", "children"), Input("future-data", "data"), Input("basic-data", "data"))
 
 def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
@@ -157,7 +165,3 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     table = dbc.Table(table_header + table_body, bordered=True, className="table-secondary table-hover card-body")
     return table 
 
-@dash.callback(Output("regression-mainpage", "data"), Input("future-data", "data"))
-
-def share_data(jsonified_cleaned_data):
-    return jsonified_cleaned_data

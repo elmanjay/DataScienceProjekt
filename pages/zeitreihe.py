@@ -21,6 +21,7 @@ module_dir = os.path.join(current_dir, "backend")
 sys.path.append(module_dir)
 from backend_arima import predict_arima
 
+#Setzen des aktuellen Datums
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
 
@@ -29,6 +30,7 @@ dash.register_page(__name__)
 layout = dbc.Container([
     dbc.Row([
         dbc.Col([
+            #Ausgabe Div welches den Graphen enthält
             html.Div([
                 html.H2("ARIMA:", className="card-header"),
                 html.Hr(),
@@ -37,6 +39,7 @@ layout = dbc.Container([
         dbc.Row(
             [
                 dbc.Col(dbc.Container([dbc.Row([dbc.Label("Auswahl der Datengrundlage:", className="font-weight-bold")]),
+                #Radio Items zur Auswahl der Datengrundlage
                   dbc.Row([dbc.RadioItems(
                                             id="zeitraum-arima",
                                             options=[
@@ -52,6 +55,7 @@ layout = dbc.Container([
                                        
                                        ])
                         ),
+                #Inputs zur auswhal der Parameter
                 dbc.Col(dbc.Container([dbc.Row([dbc.Label("Auswahl der Paramenter:", className="font-weight-bold")]),
                   dbc.Row([dbc.Container(
     [
@@ -80,6 +84,7 @@ layout = dbc.Container([
         dbc.Col([
             dbc.Container([
                 dbc.Row([
+                    #Div der Performancemaße
                     html.Div([
                         html.H2("Performance:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
@@ -87,6 +92,7 @@ layout = dbc.Container([
                     ], className="card text-white bg-primary mb-3")
                 ]),
                 dbc.Row([
+                    #Div der Prognosedaten
                     html.Div([
                         html.H2("Prognose:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
@@ -97,10 +103,12 @@ layout = dbc.Container([
         ], width=6)
     ]),
     dcc.Store(id="basic-data"),
+    #Zwischenspeicherung der Arima Ergebnisse
     dcc.Store(id="prediction-arima"),
     dcc.Store(id="metrics-arima")
 ], fluid=True)
 
+#Überprüfen ob Parameter ARIMA korrekt gewählt sind
 @dash.callback(Output("alert-value-int","is_open") ,Input("input-p","value"),Input("input-d","value"),Input("input-q","value"))
 
 def update_prediction_data(p_value, d_value, q_value):
@@ -113,6 +121,7 @@ def update_prediction_data(p_value, d_value, q_value):
         error = True
     return error
 
+#Aktualisierung ARIMA Parameter falls diese korrekt gewählt wurden
 @dash.callback(Output("prediction-arima","data"),Output("metrics-arima","data"),Input("basic-data","data"),Input("zeitraum-arima","value"),Input("input-p","value"),Input("input-d","value"),Input("input-q","value"))
 
 def update_prediction_data(basic_data,zeitraum,p_value, d_value, q_value):
@@ -130,19 +139,19 @@ def update_prediction_data(basic_data,zeitraum,p_value, d_value, q_value):
     prediction, metrics = predict_arima(df,p=p_real,d=d_real,q=q_real , years= zeitraum)
     return prediction.to_json(date_format="iso", orient="split"), json.dumps(metrics)
 
-
+#Plotten der Vorhergesagten Daten
 @dash.callback(Output("graph_arima","figure"),Input("prediction-arima","data"))
 
 def update_prediction_data(prediction_data):
     df = pd.read_json(prediction_data, orient="split")
-    df["Date"] = pd.Series(df["Date"], dtype="string")  # Konvertiere das Datum in einen String
+    df["Date"] = pd.Series(df["Date"], dtype="string")  
     df["Date"] = df["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})') 
     figure = px.scatter(template="plotly_dark")
     figure.add_trace(go.Scatter(x=df["Date"], y=df["Train"], mode="lines", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=df["Date"], y=df["Test"], mode="lines", name="Testdaten"))
     figure.add_trace(go.Scatter(x=df["Date"], y= df["Prediction"], mode="lines", name="Vorhersage"))
     figure.update_layout(xaxis_title="Datum", yaxis_title="Kurs (EUR)", xaxis_type="category")
-    figure.update_xaxes(tickformat="%Y-%m-%d")  # X-Achsenbeschriftung im gewünschten Format festlegen
+    figure.update_xaxes(tickformat="%Y-%m-%d")  
     
     # Anzahl der X-Achsenbeschriftungen festlegen
     num_ticks = 10
@@ -150,18 +159,15 @@ def update_prediction_data(prediction_data):
     # Werte und Beschriftungen für die X-Achsenbeschriftung auswählen
     step = len(df["Date"]) // num_ticks
     tickvals = df["Date"][::step]
-    #ticktext = [date.strftime("%Y-%m-%d") for date in tickvals]
-
-    # Manuelle Anpassung der X-Achsenbeschriftungen
     figure.update_xaxes(
         tickmode="array",
         tickvals=tickvals,
         ticktext=tickvals
     )
 
-    #figure.data[0].name = "Trainingsdaten"
     return figure
 
+#Darstellung der Vorhergesagen in einer Tabelle
 @dash.callback(Output("future-pred-table-arima", "children"), Input("prediction-arima", "data"), Input("basic-data", "data"))
 
 def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
@@ -201,7 +207,7 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     table = dbc.Table(table_header + table_body, bordered=True, className="table-secondary table-hover card-body")
     return table
 
-
+#Erstellung Output der ARIMA Metriken
 @dash.callback(Output("output-div-performance-arima", "children"), Input("metrics-arima","data"))
 
 def update_div_performace(metrics_list):

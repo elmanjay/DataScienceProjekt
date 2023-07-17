@@ -81,6 +81,8 @@ def update_graph_lstm(prediction):
     prediction_data.reset_index(inplace=True,names="Date")
     prediction_data["Date"] = pd.Series(prediction_data["Date"], dtype="string") 
     prediction_data["Date"] = prediction_data["Date"].str.extract(r'^(\d{4}-\d{2}-\d{2})')
+    prediction_data['Neue Spalte'] = pd.concat([prediction_data['Predicted Test'], prediction_data['Predicted Future"']], axis=0)
+    print(prediction_data['Neue Spalte'])
     figure = px.scatter(template="plotly_dark")
     figure.add_trace(go.Scatter(x=prediction_data["Date"], y=prediction_data["Train"], mode="lines", name="Trainingsdaten"))
     figure.add_trace(go.Scatter(x=prediction_data["Date"], y=prediction_data["Test"], mode="lines", name="Testdaten"))
