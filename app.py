@@ -76,11 +76,8 @@ app.layout = dbc.Container([
                                 style={"text-align": "center", "margin-top": "10px"}, className="text-tertiary")),
                 className="fixed-bottom text-white bg-primary")
         ], fluid=True),
-        # Store-Komponente zum Speichern von Daten
-        dcc.Store(id="basic-data"),
-        dcc.Store(id="regression-mainpage"),
-        html.P(id="dummy")
-
+        # Store-Komponente zum Speichern der Basisdaten
+        dcc.Store(id="basic-data")
     ]),
 ], fluid=True)
 
@@ -88,7 +85,7 @@ app.layout = dbc.Container([
 @app.callback(Output("basic-data", "data"), Input("aktien-dropdown", "value"))
 def clean_data(value):
     if value:
-        # Daten von Yahoo Finance abrufen und bereinigen
+        # Daten von Yahoo Finance abrufen 
         msft = yf.Ticker(value)
         df = msft.history(period="max")
         df.reset_index(inplace=True)

@@ -26,7 +26,7 @@ dash.register_page(__name__)
 layout = dbc.Container([
     dbc.Row([
         dbc.Col([
-            #Div welches den Graphen und die Radiobuttons enthält
+            #Card die den Graphen beinhaltet
             html.Div([
                 html.H2("Lineare Regression:", className="card-header"),
                 html.Hr(),
@@ -53,7 +53,7 @@ layout = dbc.Container([
         dbc.Col([
             dbc.Container([
                 dbc.Row([
-                    #Div mit den Performance Maßen
+                    #Card mit den Performancemaßen
                     html.Div([
                         html.H2("Performance:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
@@ -61,7 +61,7 @@ layout = dbc.Container([
                     ], className="card text-white bg-primary mb-3")
                 ]),
                 dbc.Row([
-                    #Div mit den Prognose Werten
+                    #Card mit den Prognosedaten
                     html.Div([
                         html.H2("Prognose:", className="card-header"),
                         html.Hr(style={"margin-top": "0px"}),
@@ -71,8 +71,9 @@ layout = dbc.Container([
             ])
         ], width=6)
     ]),
+    #Store-Komponente zum Speichern der Basisdaten
     dcc.Store(id="basic-data"),
-    #Zwischenspeicher der Vorhersagedaten
+    #Store-Komponenten zum Speichern der Regressions-Daten
     dcc.Store(id="regression-data"),
     dcc.Store(id="future-data")
 ], fluid=True)
@@ -122,18 +123,20 @@ def update_graph(jsonified_cleaned_data):
 
 def update_div_performace(jsonified_cleaned_data):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
+    #Aufrufen der Performancemaße
     r2= round(df["R2 Score"].iloc[0],2)
     mse= round(df["MSE"].iloc[0],2)
     mae = round(df["MAE"].iloc[0],2)
     smae = round(df["Scaled_mae"].iloc[0] * 100,2)
     rmse= round(df["RMSE"].iloc[0],2)
+    #Erstellen Output-DIV
     output = [
         html.P("R2 Score: {}".format(r2), className= "font-weight-bold"),
         html.P("Mean Squared Error: {}".format(mse), className= "font-weight-bold"),
         html.P("Mean Absolute Error: {}".format(mae), className= "font-weight-bold"),
         html.P("Scaled Mean Absolute Error: {}%".format(smae), className= "font-weight-bold"),
-        html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold"),
-    ]
+        html.P("Root Mean Square Error: {}".format(rmse), className= "font-weight-bold")]
+    
     return output
 
 #Erstellen der Vorhersage Tabelle
@@ -143,6 +146,7 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
     df["Date"] = pd.Series(df["Date"], dtype="string")
     df_basic= pd.read_json(jsonified_cleaned_data_basic, orient="split")
+    #Bestimmen der relevanten Datumseinträge
     today_value = df_basic["Close"].iloc[len(df_basic)-1]
     entwicklung_tomorrow = round((df["Predictions"].iloc[0] - today_value) / today_value *100,2)
     entwicklung_week = round((df["Predictions"].iloc[6] - today_value) / today_value *100,2)
@@ -152,16 +156,13 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
         if math.floor(element) >= 0:
             element = "+"+str(element) 
         entwicklungen.append(element)
-
-    table_header = [
-    html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
-
+    #Erstellen der Tabelle
+    table_header = [html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
     row1 = html.Tr([html.Td("Morgen"), html.Td(str(round(df["Predictions"].iloc[0], 2))+"€"), html.Td(str(entwicklungen[0])+"%"), html.Td(df["Date"].iloc[0])])
     row2 = html.Tr([html.Td("7 Tage"), html.Td(str(round(df["Predictions"].iloc[6], 2))+"€"), html.Td(str(entwicklungen[1])+"%"),html.Td(df["Date"].iloc[6])])
     row3 = html.Tr([html.Td("14 Tage"), html.Td(str(round(df["Predictions"].iloc[13], 2))+"€"), html.Td(str(entwicklungen[2])+"%"),html.Td(df["Date"].iloc[13])])
-
     table_body = [html.Tbody([row1, row2, row3])]
-
     table = dbc.Table(table_header + table_body, bordered=True, className="table-secondary table-hover card-body")
+    
     return table 
 
