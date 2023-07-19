@@ -10,7 +10,7 @@ import datetime
 import locale
 import pytz
 import numpy as np
-from backend_regression import make_pred_month
+from backend_regression import make_pred_reg
 from backend_lstm import lstm_stock_prediction
 from backend_arima import predict_arima
 now = datetime.datetime.now()
@@ -253,7 +253,7 @@ def update_reg_main(symbol, data):
     forecasts = []
     percentage = []
     df = pd.read_json(data, orient="split")
-    result_regression = make_pred_month(df, 30)
+    result_regression = make_pred_reg(df, 30)
     result_lstm, metrics, futurelstm= lstm_stock_prediction(df, 365, ticker=symbol, prediction_days=14)
     result_arima , metrics = predict_arima(df,1,2,1)
     value_lstm = round(float(futurelstm["Predicted Future"].iloc[1]), 2)

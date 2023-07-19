@@ -12,7 +12,6 @@ import plotly.graph_objects as go
 import locale
 import datetime
 import math
-import pytz
 import sys
 import os
 import json
@@ -121,10 +120,11 @@ def update_prediction_data(p_value, d_value, q_value):
 
     return error
 
-#Berechnung der Vorhersage und  Ausgabe der Ergebnisse
+#Berechnung der Vorhersage und Ausgabe der Ergebnisse
 @dash.callback(Output("prediction-arima","data"),Output("metrics-arima","data"),Input("basic-data","data"),Input("zeitraum-arima","value"),Input("input-p","value"),Input("input-d","value"),Input("input-q","value"))
 
 def update_prediction_data(basic_data,zeitraum,p_value, d_value, q_value):
+    #Setzen der default Parameter
     p_real= 1
     d_real = 2
     q_real = 1

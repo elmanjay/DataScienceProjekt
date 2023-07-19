@@ -12,7 +12,7 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 module_dir = os.path.join(current_dir, "backend")
 sys.path.append(module_dir)
-from backend_regression import make_pred, make_pred_month
+from backend_regression import make_pred_reg
 import plotly.graph_objects as go
 
 # Liste der Aktiensymbole und ihrer Namen
@@ -83,12 +83,12 @@ layout = dbc.Container([
 
 def generate_data(jsonified_cleaned_data,zeitraum):
     df = pd.read_json(jsonified_cleaned_data, orient="split")
-    regression, futurregression = make_pred_month(df, zeitraum)
+    regression, futurregression = make_pred_reg(df, zeitraum)
     regressiondata = regression.to_json(date_format="iso", orient="split")
     futuredata = futurregression.to_json(date_format="iso", orient="split")
     return regressiondata , futuredata
 
-#Erstellen des Graphen
+#Erstellen des Prognose-Graphen  
 @dash.callback(Output("graph_regression", "figure"), Input("regression-data", "data"))
 
 def update_graph(jsonified_cleaned_data):
@@ -118,7 +118,7 @@ def update_graph(jsonified_cleaned_data):
     figure.data[0].name = "Trainingsdaten"
     return figure
 
-#Erstellen des Performance Divs
+#Erstellen Ausgabe der Performancemaße
 @dash.callback(Output("output-div-performance", "children"), Input("regression-data", "data"))
 
 def update_div_performace(jsonified_cleaned_data):
@@ -139,7 +139,7 @@ def update_div_performace(jsonified_cleaned_data):
     
     return output
 
-#Erstellen der Vorhersage Tabelle
+#Erstellen Ausgabe der Prognosedaten
 @dash.callback(Output("future-pred-table", "children"), Input("future-data", "data"), Input("basic-data", "data"))
 
 def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
