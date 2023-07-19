@@ -127,7 +127,7 @@ def update_div_performace(jsonified_cleaned_data):
     r2= round(df["R2 Score"].iloc[0],2)
     mse= round(df["MSE"].iloc[0],2)
     mae = round(df["MAE"].iloc[0],2)
-    smae = round(df["Scaled_mae"].iloc[0] * 100,2)
+    smae = round(df["Scaled MAE"].iloc[0] * 100,2)
     rmse= round(df["RMSE"].iloc[0],2)
     #Erstellen Output-DIV
     output = [
