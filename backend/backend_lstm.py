@@ -39,47 +39,6 @@ def create_model():
 def train_model(model, X_train, y_train, X_val, y_val, epochs=200):
     model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=epochs)
 
- #Achtung optimale epochen für ablauf müssen noch bestimmt werden   
-def lstm_stock_prediction(ticker_symbol, start_date, end_date, prediction_days=14):
-    ticker = yf.Ticker(ticker_symbol)
-    df = ticker.history(start=start_date, end=end_date, actions=False)
-    df = df[["Close"]]
-
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(df.values)
-
-    train_len = int(len(scaled_data) * 0.92)
-    train_data = scaled_data[:train_len, :]
-    test_data = scaled_data[train_len - 2:, :]
-
-    x_train, y_train = [], []
-    interval = 10
-
-    for i in range(interval, len(train_data)):
-        x_train.append(train_data[i - interval:i, 0])
-        y_train.append(train_data[i, 0])
-
-    x_train, y_train = np.array(x_train), np.array(y_train)
-    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-
-    model = create_model()
-    train_model(model, x_train, y_train, x_train, y_train, epochs=200)
-
-    x_test = np.array([test_data[-interval:, 0]])
-    predictions = []
-
-    for _ in range(prediction_days):
-        prediction = model.predict(x_test)
-        predictions.append(prediction[0][0])
-        x_test = np.append(x_test[:, 1:], prediction, axis=1)
-
-    predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
-
-    last_date = df.index[-1]
-    prediction_dates = pd.date_range(start=last_date + pd.Timedelta(days=1), periods=prediction_days, freq="B")
-    prediction_table = pd.DataFrame(predictions, columns=["Predicted Close"], index=prediction_dates)
-    return prediction_table 
-
 def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="Default"):
     df = df.copy()  # Erstelle eine Kopie des DataFrames, um Änderungen daran vorzunehmen
     df = df.drop(["Open", "High","Low","Volume","Dividends","Stock Splits"], axis=1)
@@ -227,17 +186,10 @@ def pretrain_list(list_ticker):
         df.reset_index(inplace= True)
         lstm_stock_prediction_pretrain(df, 1095, prediction_days=14, ticker=element)
 
-#msft = yf.Ticker("ALV.DE")
-#df = msft.history(period="max")
-#df.reset_index(inplace= True)
 
-#full, metrics, future = lstm_stock_prediction(df, 365, ticker="ALV.DE", prediction_days=14)
 
-#print(full.tail())
-#print(metrics)
-#print(future)
+#Ausführen um die Moelle Vorzutrainieren:
 #assets = ["ALV.DE", "AMZ.DE", "DPW.DE", "MDO.DE", "NVD.DE","^MDAXI"]
-
 #pretrain_list(assets)
 
 

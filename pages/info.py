@@ -28,6 +28,7 @@ layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(
+                    #Card die den Graphen beinhaltet
                     html.Div(
                         children=[
                             html.H2("Verlauf der Aktie:", className="card-header"),
@@ -59,6 +60,7 @@ layout = dbc.Container(
                             dbc.Row(
                                 [
                                     dbc.Col(
+                                        #Card mit den aktuellen Marktdaten
                                         html.Div(
                                             children=[
                                                 html.H2("Aktuelle Marktdaten:", className="card-header"),
@@ -72,6 +74,7 @@ layout = dbc.Container(
                                         ),
                                     width=6),
                                     dbc.Col(
+                                        #Card mit den historischen Marktdaten
                                         html.Div(
                                             children=[
                                                 html.H2("Historische Daten:", className="card-header"),
@@ -92,6 +95,7 @@ layout = dbc.Container(
                             dbc.Row(
                                 [
                                     dbc.Col(
+                                        #Card mit zusammengefassten Prognosewerten
                                         html.Div(
                                             children=[
                                                 html.H2("Prognose:", className="card-header"),
@@ -110,7 +114,9 @@ layout = dbc.Container(
                 )
             ]
         ),
+    #Store-Komponente zum Speichern der Basisdaten
     dcc.Store(id="basic-data"),
+    #Store-Komponenten zum Speichern der gefilterten Daten
     dcc.Store(id= "time-filtered-data")
 ],fluid=True)
 
@@ -271,7 +277,6 @@ def update_reg_main(symbol, data):
     output = [
         html.P(f"Lineare Regression({percentage[0]}%): {forecasts[0]}€", className="font-weight-bold"),
         html.P(f"LSTM({percentage[1]}%): {forecasts[1]}€", className="font-weight-bold"),
-        html.P(f"Arima({percentage[2]}%): {forecasts[2]}€", className="font-weight-bold")
-    ]
+        html.P(f"Arima({percentage[2]}%): {forecasts[2]}€", className="font-weight-bold")]
 
     return output
