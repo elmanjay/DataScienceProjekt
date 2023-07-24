@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
+#Funktion die als Input die ungefilterten Daten aus dem dcc.Store erählt und das relevante zeitintervall in Tage
+#Ausgabe: Dataframe mit Trainigs-,Test- und Prognosedaten 
 def make_pred_reg(df, days_to_consider):
     #Formatieren und Filtern des Data Frames
     df_copy = df.copy()
