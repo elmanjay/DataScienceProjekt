@@ -4,7 +4,7 @@ import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
+def predict_arima(df_input,p,d,q,years=2,prediction_days=15):
 
     def is_business_day(date):
         return bool(len(pd.bdate_range(date, date)))
@@ -23,7 +23,6 @@ def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
     
     df["Train"] = df["Close"].iloc[:-10] 
     df["Test"] = df["Close"].iloc[-10:]
-    #new_df = pd.DataFrame(df["Test"]) # Erstelle Spalte 'Train' mit den Trainingsdaten
 
 
     model = ARIMA(df["Train"] , order=(p,d,q))  # p, d, q sind die gewählten Ordnungsparameter
@@ -34,14 +33,9 @@ def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
     forecast = model_fit.forecast(steps=10+prediction_days) # Anzahl der zukünftigen Perioden für die Prognose angeben
     liste_forecasts = forecast.tolist() # erstellt eine Liste mit den Werten, die durch Model predicted wurden
     df_forecasts = pd.DataFrame(liste_forecasts , index=listinex) # erstellt ein df aus der Liste: liste_forecasts
-    #today = datetime.date.today()
 
     # Liste für die nächsten 14 Tage
     letzte_zeile = df.tail(1) # speichert die letzte Zeile des urspr. df ab
-    #gewünschter_wert = letzte_zeile.at[letzte_zeile.index[0], "Date"]
-    #date_list = [gewünschter_wert + timedelta(days=i) for i in range(1,15)]
-    #print(date_list)
-    #print(len(date_list))
     df_forecasts.rename(columns={0: "Prediction"}, inplace=True)
     merged_df = pd.merge(df, df_forecasts, left_index=True, right_index=True, how="outer")
 
@@ -59,14 +53,10 @@ def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
     scaled_mae = mae / df["Test"].iloc[-10:].mean()
 
     metrics= [mae,mse,rmse,scaled_mae]
-    #print(f"[Test evaluation] mean_squared_error: {error}")
-
-    #print(df["Test"].iloc[-10:])
-    #print(df_forecasts.iloc[:10])
+   
 
     # Berechne den durchschnittlichen Zeitunterschied zwischen aufeinanderfolgenden Datenpunkten in der Spalte "Date"
     time_delta = merged_df["Date"].diff().mean().round("d") 
-    #print(f"Calculated avarage time delta rounded to days: {time_delta}")
 
     for index, date in enumerate(merged_df["Date"]):  # Iteriere über den Index und das Datum der Spalte "Date" des DataFrames
         if pd.isnull(date):  # Überprüfe, ob das Datum fehlt (null) ist
@@ -77,11 +67,7 @@ def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
                 final_date = final_date + pd.Timedelta(days=1)  # Falls nicht, erhöhe das Datum um `time_delta` und überprüfe erneut
 
             merged_df.at[index, "Date"] = final_date  # Setze das berechnete Datum als neues Datum für die aktuelle Zeile im DataFrame       
-    #print(merged_df.tail(40))
     return(merged_df, metrics)
 
 
-#msft = yf.Ticker("NVD.DE")
-#df = msft.history(period="max")
-#df = df.reset_index()
-#result = predict_arima(df)
+
