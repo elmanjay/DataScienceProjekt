@@ -208,7 +208,7 @@ def update_datum(symbol):
     change_pct = (data["regularMarketOpen"] - data["regularMarketPreviousClose"]) / data["regularMarketPreviousClose"] * 100
     change_pct = round(change_pct, 2)
 
-    # Vorzeichen und Pfeil basierend auf der Änderung berechnen
+    # Vorzeichen und Pfeil basierend auf der berechneten Änderung festlegen
     if change_pct > 0:
         vorzeichen = "+"
         arrow = "▲"
@@ -259,6 +259,7 @@ def update_reg_main(symbol, data):
     forecasts = []
     percentage = []
     df = pd.read_json(data, orient="split")
+    #Erstellen der Prognose
     result_regression = make_pred_reg(df, 30)
     result_lstm, metrics, futurelstm= lstm_stock_prediction(df, 365, ticker=symbol, prediction_days=14)
     result_arima , metrics = predict_arima(df,1,2,1)
@@ -267,6 +268,7 @@ def update_reg_main(symbol, data):
     forecasts.append(round(value_lstm, 2))
     forecasts.append(round(result_arima["Prediction"].iloc[result_arima["Test"].last_valid_index()+2],2))
 
+    #Festlegen Vorzeichen und Berecnung der Änderungsrate
     for element in forecasts:
         value = (element - close_price) / close_price * 100
         value = round(value, 2)
@@ -274,6 +276,7 @@ def update_reg_main(symbol, data):
             value = "+" + str(value)
         percentage.append(value)
 
+    #Erstellen des Output
     output = [
         html.P(f"Lineare Regression({percentage[0]}%): {forecasts[0]}€", className="font-weight-bold"),
         html.P(f"LSTM({percentage[1]}%): {forecasts[1]}€", className="font-weight-bold"),

@@ -25,7 +25,6 @@ app.layout = dbc.Container([
         # Navbar für die Navigation
         dbc.Navbar(
             [
-                # Brand-Name der Navbar
                 dbc.NavbarBrand("Aktien Analyse", className="navbar-brand", style={"margin-left": "10px"}),
                 # NavLinks für die verschiedenen Seiten der Analyse
                 dbc.NavItem(dbc.NavLink("Info", href="/")),
@@ -94,4 +93,4 @@ def clean_data(value):
 
 # Starte die App
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
