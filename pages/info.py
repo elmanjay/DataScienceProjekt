@@ -13,15 +13,12 @@ import numpy as np
 from backend_regression import make_pred_reg
 from backend_lstm import lstm_stock_prediction
 from backend_arima import predict_arima
+
+#Setzen des aktuellen Datums
 now = datetime.datetime.now()
 locale.setlocale(locale.LC_TIME, 'de_DE')
 
-
 dash.register_page(__name__, path='/')
-
-
-
-
 
 layout = dbc.Container(
     [

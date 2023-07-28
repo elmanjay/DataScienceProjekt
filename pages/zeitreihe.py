@@ -187,15 +187,16 @@ def update_div_forecast(jsonified_cleaned_data, jsonified_cleaned_data_basic):
         if math.floor(element) >= 0:
             element = "+"+str(element) 
         entwicklungen.append(element)
+
     #Bestimmen der relevanten Datumseinträge
     today= datetime.date.today()
     tomorrow = today + datetime.timedelta(days=1)
     week = today + datetime.timedelta(days=7)
     twoweek=  today + datetime.timedelta(days=14)
-
     tomorrow_value = df[df["Date"] == str(tomorrow)]
     week_value = df[df["Date"] == str(week)]
     twoweek_value = df[df["Date"] == str(twoweek)]
+    
     #Erstellen der Tabelle
     table_header = [
     html.Thead(html.Tr([html.Th(""), html.Th("Kursprognose"),html.Th("Entwicklung"), html.Th("Datum")]))]
