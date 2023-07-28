@@ -39,13 +39,13 @@ def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
     liste_forecasts = forecast.tolist() 
     df_forecasts = pd.DataFrame(liste_forecasts , index=listinex) 
     df_forecasts.rename(columns={0: "Prediction"}, inplace=True)
-    merged_df = pd.merge(df, df_forecasts, left_index=True, right_index=True, how="outer")
+    df_wholedata = pd.merge(df, df_forecasts, left_index=True, right_index=True, how="outer")
 
    # Verschiebe die prognostizierten Werte um eine Zeile nach unten
-    last_value = merged_df["Prediction"].iloc[-1] 
-    merged_df["Prediction"] = merged_df["Prediction"].shift(1) 
-    merged_df.loc[merged_df.index[-1] + 1, "Prediction"] = last_value 
-    merged_df = merged_df.reset_index(drop=True) 
+    last_value = df_wholedata["Prediction"].iloc[-1] 
+    df_wholedata["Prediction"] = df_wholedata["Prediction"].shift(1) 
+    df_wholedata.loc[df_wholedata.index[-1] + 1, "Prediction"] = last_value 
+    df_wholedata = df_wholedata.reset_index(drop=True) 
 
     # Berechne der Metriken
     mae = mean_absolute_error(df["Test"].iloc[-10:], df_forecasts.iloc[:10])
@@ -56,21 +56,21 @@ def predict_arima(df_input,p,d,q, years=2,prediction_days= 15):
 
 
     # Berechne den durchschnittlichen Zeitunterschied zwischen aufeinanderfolgenden Datenpunkten in der Spalte "Date"
-    time_delta = merged_df["Date"].diff().mean().round("d") 
+    time_delta = df_wholedata["Date"].diff().mean().round("d") 
     
     #Iteriere über die "Date" Spalte, um fehlende Datumsangaben zu vervollständigen
-    for index, date in enumerate(merged_df["Date"]):  
+    for index, date in enumerate(df_wholedata["Date"]):  
         if pd.isnull(date):  
-            previous_date = merged_df.at[index-1, "Date"]  
+            previous_date = df_wholedata.at[index-1, "Date"]  
             final_date = previous_date + time_delta 
 
             while not is_business_day(final_date):  
                 final_date = final_date + pd.Timedelta(days=1)  
 
-            merged_df.at[index, "Date"] = final_date       
+            df_wholedata.at[index, "Date"] = final_date       
     
     # Gib das DataFrame mit den Prognosen und die berechneten Metriken zurück
-    return(merged_df, metrics)
+    return df_wholedata, metrics
 
 
 

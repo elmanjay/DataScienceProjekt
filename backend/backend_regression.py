@@ -74,6 +74,7 @@ def make_pred_reg(df, days_to_consider):
         "Predictions": future_predictions
     })
     
+    # Gib das DataFrame mit den Prognosen und die berechneten Metriken zurück
     return df_wholedata, future_df
 
 
