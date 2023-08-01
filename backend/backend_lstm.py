@@ -36,10 +36,13 @@ def create_model():
     return model
 
 #Die Funktion Trainiert das neuronale Netz auf den übergebenen Daten.
+#Überwachung währenddessen erfolgt mit den Validierungsdatensätzen X_val, y_val, Modell trainiert über Zeitraum von 200 Epochen.
 def train_model(model, X_train, y_train, X_val, y_val, epochs=200):
     model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=epochs)
 
-# Die Funktion erhält die Daten der Aktie sowie das gewünschte Zeitintervall, um die Modelle vorzutrainieren und zu speichern. 
+#Die Funktion erhält die Daten der Aktie sowie das gewünschte Zeitintervall, um die Modelle vorzutrainieren und zu speichern.
+#Nachdem die Daten zurücktransformiert wurden, gibt es drei Data Frames: 
+#future_prediction_table, test_prediction_table und full_table, die die Vorhersagen und die tatsächlichen Werte enthalten.
 def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="Default"):
     df = df.copy() 
     #Bearbeitung der Datengrundlage 
@@ -77,8 +80,8 @@ def lstm_stock_prediction_pretrain(df, daysgiven, prediction_days=14, ticker="De
     name = str(ticker)+ "_lstm_model" 
     save_model(model, "models/lstm/"+str(name), save_format='tf')
 
-# Funktion zur Erstellung der Prognose. Sie erhält die Daten sowie das gewünschte Zeitintervall.
-# Anschließend wird das benötigte Modell geladen und eine Prognose für die gewünschten Tage erstellt.
+#Funktion zur Erstellung der Prognose. Sie erhält die Daten sowie das gewünschte Zeitintervall.
+#Anschließend wird das benötigte Modell geladen und eine Prognose für die gewünschten Tage erstellt.
 def lstm_stock_prediction(df, daysgiven, ticker="ALV.DE", prediction_days=14):
     df = df.copy()  
     # Datenbereinigung
@@ -173,6 +176,7 @@ def lstm_stock_prediction(df, daysgiven, ticker="ALV.DE", prediction_days=14):
 
 
 #Funktion zur Berechnung verschiedener Metriken für die Vorhersage
+ #Die berechneten Metriken werden in dem neuen Data Frame metrics_table gespeichert. 
 def calculate_metrics(prediction_table):
     true_values = prediction_table["True Close"]
     predicted_values = prediction_table["Predicted Close"]
